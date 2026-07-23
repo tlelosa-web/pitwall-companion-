@@ -15,8 +15,9 @@ living tracker you can update on the go.
 
 ## Features
 
+- Four tabs: **Drivers**, **Parts** (components), **Season**, and **Rewards**.
 - **Drivers** tab grouped by rarity (Common, Rare, Epic, Legendary) and a
-  **Components** tab grouped by category (Front Wing, Brakes, Suspension, Rear
+  **Parts** tab grouped by category (Front Wing, Brakes, Suspension, Rear
   Wing, Gearbox, Engine, Battery).
 - Each card shows a **rarity badge**, a **Level** with −/+ steppers, an
   **editable card count**, and a **progress bar toward the next level** (or
@@ -32,6 +33,40 @@ living tracker you can update on the go.
 - **Search** by name and **filter chips** (All + each group of the active tab).
 - **Export** / **Import** a JSON backup, and **Reset** to the built-in defaults.
 - **Dark mode by default**, honoring `prefers-color-scheme`.
+
+### Season tab (progress dashboard)
+
+A live snapshot of your season, seeded from the workbook's **CC Tracker**:
+
+- **Season countdown** — a *days-left* counter plus editable **Season start**
+  and **Season end** dates and a *season elapsed* bar (today is read live from
+  the device clock).
+- **Collection & race progress** — editable **current ÷ target** counts for
+  Drivers, Driver Upgrades, Parts and Part Upgrades, plus milestone pickers for
+  Weekly League, GP Medals (total & best), Highest Series, Races Done and Races
+  Won. Each row shows a progress bar and a live percentage.
+- **CC Score** — **Base Asset Progress**, **CC Rank** (/20), **CC Points**
+  (/500) and **Total CC** (/650), all **recomputed live** exactly as the
+  workbook does (average of the ten base metrics → rank → points → plus the
+  coin-bank contribution). Editing any input updates the score instantly.
+
+Season inputs are saved separately in `localStorage` under **`f1sheet.season.v1`**
+(schema-guarded, seeded from the v1.0 snapshot). Nothing leaves the device.
+
+### Rewards tab (reference tables)
+
+Read-only, searchable reference tables embedded from the community sheet
+(identical in v1.0 and v1.1):
+
+- **Race Medal Payout** — medal-pot share by tier and finishing position.
+- **Weekly League** — completion weight by final standing.
+- **Races & Wins Milestones** — completion weight by total races/wins.
+- **Series Progress** — completion weight by highest Series reached.
+- **GP Medal Quality** — best-medal scoring scale.
+- **Coins → CC** — coin-bank milestone to CC contribution.
+
+The percentages are the same completion weights the Season tab uses for CC
+scoring. Type in the search box to filter tables and rows.
 
 ### Reference data (stats & coin costs)
 
@@ -74,12 +109,28 @@ go offline and it keeps working.
 
 ## How your data is stored
 
-- Everything lives in `localStorage` under the key **`f1sheet.v1`**.
+- Card levels/counts live in `localStorage` under the key **`f1sheet.v1`**.
 - Only values you **change** are stored (as *overrides* keyed by card id), so
   future seed-data updates still flow through to cards you haven't touched.
-- A `schema` field is stored for safe future migrations.
+- Season-dashboard values live under a separate key **`f1sheet.season.v1`**.
+- A `schema` field is stored on each for safe future migrations.
 - Card id format: `d:<Rarity>:<Name>` for drivers, `c:<Category>:<Name>` for
   components.
+
+> **Note:** Export / Import currently covers the card overrides (`f1sheet.v1`).
+> Season inputs persist locally but aren't yet part of the backup file.
+
+### Data notes / limitations
+
+- The **Race Medal Payout**, **Weekly League**, **Races/Wins**, **Series**,
+  **GP Medal** and **Coins → CC** tables are byte-identical in the v1.0 and
+  v1.1 workbooks, so they're treated as stable game constants.
+- **GP Medals Total** counts toward the CC score as complete once you hold at
+  least one GP medal (mirroring the workbook's `IF(total>1, 1, total)` rule).
+- The task brief mentioned a *"which driver + component unlocks at which
+  Series"* roster. The v1.0 workbook has a Series → completion-weight table
+  (shown under **Series Progress**) but **no** explicit per-Series unlock list,
+  so that roster is intentionally omitted rather than guessed.
 
 Use **Export** to save a JSON backup and **Import** to restore it on another
 device or after clearing browser data.
