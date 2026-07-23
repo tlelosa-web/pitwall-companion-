@@ -30,6 +30,12 @@ living tracker you can update on the go.
   reach max**.
 - **Collection "to max" summary** at the top of each tab: total cards left,
   total coins left, and how many cards are already maxed.
+- **Asset Trading surplus** — once a card is maxed, the cards you keep piling up
+  become tradeable surplus. Each maxed card shows a **♻ *N* to trade** chip and,
+  in its Stats & costs panel, the surplus count and how many Asset Trades it's
+  worth (Common ×1000, Rare ×100, Epic ×10, Legendary ×3 surplus per trade). The
+  collection summary totals the surplus and trades available across the tab, and
+  it all recomputes live as you edit card counts.
 - **Search** by name and **filter chips** (All + each group of the active tab).
 - **Export** / **Import** a JSON backup, and **Reset** to the built-in defaults.
 - **Dark mode by default**, honoring `prefers-color-scheme`.
@@ -71,23 +77,22 @@ scoring. Type in the search box to filter tables and rows.
 ### Reference data (stats & coin costs)
 
 Per-level **stats** and **coin/card upgrade costs** are baked into the app from
-the *F1 Clash 2026 Resource Sheet* (v1.1 reference tables). This covers **all
-88 driver cards** and the **11 components** for which the source sheet publishes
-detailed stats (Front Wing, Brakes, Gearbox, Engine, Battery entries). Other
-components still track level and card count and show a correct **cards-to-max**
-figure (that's pure math from the cost table), but their per-level stats and
-coin costs are shown as unavailable until the source sheet adds them.
+the *F1 Clash 2026 Resource Sheet* (v1.1 `DriverStats` and `ComponentStats`
+sheets). This now covers **all 88 driver cards** (Common, Rare, Epic and
+Legendary) and **all 46 components** across the seven categories — every card's
+per-level Overtaking/Defending/etc. (drivers) or Speed/Cornering/etc.
+(components), **Total Value**, **Team Score**, and card/coin upgrade costs.
 
-> **Cards-to-max** works for every card. **Coins-to-max** and **stats** appear
-> wherever the source sheet has published the numbers.
+Cards still at **level 0** (not yet unlocked) show a "unlock to see stats"
+hint — that's expected; the numbers appear as soon as the card reaches level 1.
 
 ### Rules used for progress
 
 ```js
 // cards needed to reach the NEXT level, keyed by current level
 const COST = {1:4,2:10,3:20,4:50,5:100,6:200,7:400,8:1000,9:2000,10:4000,11:8000};
-// max level per rarity
-const CAP  = {Common:11, Rare:9, Epic:7, Legendary:5};
+// max level per rarity (from the workbook stat sheets)
+const CAP  = {Common:11, Rare:9, Epic:8, Legendary:7};
 ```
 
 Progress toward the next level is `min(amount / COST[level], 1)`; at
