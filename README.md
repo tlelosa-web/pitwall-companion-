@@ -20,10 +20,31 @@ living tracker you can update on the go.
   Wing, Gearbox, Engine, Battery).
 - Each card shows a **rarity badge**, a **Level** with −/+ steppers, an
   **editable card count**, and a **progress bar toward the next level** (or
-  **★ MAX** when the card is at its rarity cap).
+  **★ MAX** when the card is at its rarity cap). The bar label shows the
+  **coin cost** to the next level alongside the card cost.
+- **Stats & costs** panel per card (tap to expand): the card's per-level stats
+  (drivers: Overtaking / Defending / Qualifying / Race Start / Tyre Use;
+  components: Speed / Cornering / Power Unit / … as applicable), its
+  **Total Value** and **Team Score**, and the **cards + coins remaining to
+  reach max**.
+- **Collection "to max" summary** at the top of each tab: total cards left,
+  total coins left, and how many cards are already maxed.
 - **Search** by name and **filter chips** (All + each group of the active tab).
 - **Export** / **Import** a JSON backup, and **Reset** to the built-in defaults.
 - **Dark mode by default**, honoring `prefers-color-scheme`.
+
+### Reference data (stats & coin costs)
+
+Per-level **stats** and **coin/card upgrade costs** are baked into the app from
+the *F1 Clash 2026 Resource Sheet* (v1.1 reference tables). This covers **all
+88 driver cards** and the **11 components** for which the source sheet publishes
+detailed stats (Front Wing, Brakes, Gearbox, Engine, Battery entries). Other
+components still track level and card count and show a correct **cards-to-max**
+figure (that's pure math from the cost table), but their per-level stats and
+coin costs are shown as unavailable until the source sheet adds them.
+
+> **Cards-to-max** works for every card. **Coins-to-max** and **stats** appear
+> wherever the source sheet has published the numbers.
 
 ### Rules used for progress
 

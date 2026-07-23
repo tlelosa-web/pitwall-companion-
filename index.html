@@ -157,6 +157,36 @@
   .barwrap{display:flex; flex-direction:column; gap:5px}
   .barlabel{display:flex; justify-content:space-between; font-size:11px; color:var(--muted)}
   .maxrow{display:flex; align-items:center; gap:6px; color:var(--gold); font-weight:800; font-size:13px}
+  .muted{color:var(--muted)} .small{font-size:12px} .gold{color:var(--gold)}
+
+  /* collapsible stats & costs panel */
+  details.det{border-top:1px solid var(--line); margin-top:2px; padding-top:8px}
+  details.det>summary{
+    list-style:none; cursor:pointer; color:var(--muted); font-size:12px; font-weight:700;
+    display:flex; align-items:center; gap:6px; min-height:32px; user-select:none;
+  }
+  details.det>summary::-webkit-details-marker{display:none}
+  details.det>summary::before{content:"▸"; transition:transform .15s}
+  details.det[open]>summary::before{transform:rotate(90deg)}
+  .stats{display:grid; grid-template-columns:1fr 1fr; gap:4px 14px; margin:8px 0 4px}
+  .stat{display:flex; justify-content:space-between; font-size:12px; color:var(--muted)}
+  .stat b{color:var(--text); font-weight:700}
+  .stat.total{grid-column:1 / -1; border-top:1px dashed var(--line); padding-top:6px; margin-top:2px}
+  .plan{margin-top:6px}
+  .planrow{display:flex; justify-content:space-between; gap:10px; font-size:12px; color:var(--muted)}
+  .planrow b{color:var(--text); font-weight:700; text-align:right}
+
+  /* collection "to max" summary banner */
+  .summary{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:10px 12px; margin:12px 0 2px;
+  }
+  .sum-title{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:800; margin-bottom:8px}
+  .sum-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px}
+  .sum{display:flex; flex-direction:column; align-items:center; gap:2px; background:var(--surface-2);
+    border:1px solid var(--line); border-radius:10px; padding:8px 4px}
+  .sum b{font-size:17px; font-weight:800}
+  .sum small{font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em}
 
   .toolbar{
     display:flex; gap:8px; flex-wrap:wrap; margin:16px 2px 4px;
@@ -395,6 +425,14 @@ const DEFAULT = {
   }
 };
 
+/* ---------- Reference data (from v1.1 workbook: per-level stats + costs) ----------
+   Compact record per card id:
+   { r:rarity, g:group, k:kind("d"|"c"), n:[statNames],
+     s:[[stats per level]], tot:[TotalValue], team:[TeamScore],
+     cu:[coinUpg], ct:[coinTotal], ku:[cardUpg], kt:[cardTotal] }
+   Arrays are 0-indexed by (level-1). cu[L]/ku[L] = coins/cards to reach level L+1. */
+const REF = {"d:Common:Bottas":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[[2,3,5,4,6],[4,6,9,7,10],[6,8,12,10,13],[8,10,15,12,17],[10,13,18,15,20],[12,15,21,18,24],[14,17,24,20,27],[16,19,27,23,31],[17,22,30,26,34],[19,24,33,28,38],[21,26,36,31,41]],"tot":[20,36,49,62,76,90,102,116,129,142,155],"team":[20,36,49,62,76,90,102,116,129,142,155],"cu":[0,3000,13000,60000,190000,640000,2100000,4700000,7300000,9900000,12500000],"ct":[0,3000,16000,76000,266000,906000,3006000,7706000,15006000,24906000,37406000],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"d:Common:Colapinto":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[[3,5,4,6,2],[6,9,7,10,4],[8,12,10,13,6],[10,15,12,17,8],[13,18,15,20,10],[15,21,18,24,12],[17,24,20,27,14],[19,27,23,31,16],[22,30,26,34,17],[24,33,28,38,19],[26,36,31,41,21]],"tot":[20,36,49,62,76,90,102,116,129,142,155],"team":[20,36,49,62,76,90,102,116,129,142,155],"cu":[0,3000,13000,60000,190000,640000,2100000,4700000,7300000,9900000,12500000],"ct":[0,3000,16000,76000,266000,906000,3006000,7706000,15006000,24906000,37406000],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"d:Common:Lindblad":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[[5,6,2,3,4],[9,10,5,5,7],[12,13,7,7,10],[15,17,10,9,12],[18,20,12,11,15],[21,24,14,12,18],[24,27,17,14,20],[27,31,19,16,23],[30,34,21,18,26],[33,38,24,19,28],[36,41,26,21,31]],"tot":[20,36,49,63,76,89,102,116,129,142,155],"team":[20,36,49,63,76,89,102,116,129,142,155],"cu":[0,3000,13000,60000,190000,640000,2100000,4700000,7300000,9900000,12500000],"ct":[0,3000,16000,76000,266000,906000,3006000,7706000,15006000,24906000,37406000],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"d:Common:Bortoleto":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[[17,1,9,13,5],[20,3,12,16,7],[23,6,14,18,10],[26,8,17,21,13],[28,11,20,24,15],[31,13,22,27,18],[34,16,25,30,20],[37,18,28,32,23],[40,21,30,35,25],[43,23,33,38,28],[46,26,36,41,31]],"tot":[45,58,71,85,98,111,125,138,151,165,180],"team":[45,58,71,85,98,111,125,138,151,165,180],"cu":[0,8600,53000,190000,680000,2300000,5400000,11000000,16600000,22200000,27800000],"ct":[0,8600,61600,251600,931600,3231600,8631600,19631600,36231600,58431600,86231600],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"d:Common:Gasly":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[[5,9,17,1,13],[7,12,20,3,16],[10,14,23,6,18],[13,17,26,8,21],[15,20,28,11,24],[18,22,31,13,27],[20,25,34,16,30],[23,28,37,18,32],[25,30,40,21,35],[28,33,43,23,38],[31,36,46,26,41]],"tot":[45,58,71,85,98,111,125,138,151,165,180],"team":[45,58,71,85,98,111,125,138,151,165,180],"cu":[0,8600,53000,190000,680000,2300000,5400000,11000000,16600000,22200000,27800000],"ct":[0,8600,61600,251600,931600,3231600,8631600,19631600,36231600,58431600,86231600],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"d:Common:Ocon":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[[9,5,1,13,17],[12,7,3,16,20],[14,10,6,18,23],[17,13,8,21,26],[20,15,11,24,28],[22,18,13,27,31],[25,20,16,30,34],[28,23,18,32,37],[30,25,21,35,40],[33,28,23,38,43],[36,31,26,41,46]],"tot":[45,58,71,85,98,111,125,138,151,165,180],"team":[45,58,71,85,98,111,125,138,151,165,180],"cu":[0,8600,53000,190000,680000,2300000,5400000,11000000,16600000,22200000,27800000],"ct":[0,8600,61600,251600,931600,3231600,8631600,19631600,36231600,58431600,86231600],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"d:Common:Stroll":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[[13,17,5,1,9],[16,20,7,3,12],[18,23,10,6,14],[21,26,13,8,17],[24,28,15,11,20],[27,31,18,13,22],[30,34,20,16,25],[32,37,23,18,28],[35,40,25,21,30],[38,43,28,23,33],[41,46,31,26,36]],"tot":[45,58,71,85,98,111,125,138,151,165,180],"team":[45,58,71,85,98,111,125,138,151,165,180],"cu":[0,8600,53000,190000,680000,2300000,5400000,11000000,16600000,22200000,27800000],"ct":[0,8600,61600,251600,931600,3231600,8631600,19631600,36231600,58431600,86231600],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"d:Common:Bearman":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[[8,13,18,23,3],[11,16,21,26,6],[14,19,24,29,9],[16,21,26,31,11],[19,24,29,34,14],[22,27,32,37,17],[24,29,34,39,19],[27,32,37,42,22],[30,35,40,45,25],[32,37,42,47,27],[35,40,45,50,30]],"tot":[65,80,95,105,120,135,145,160,175,185,200],"team":[65,80,95,105,120,135,145,160,175,185,200],"cu":[0,35000,70000,250000,910000,3100000,7200000,15000000,22800000,30600000,38400000],"ct":[0,35000,105000,355000,1265000,4365000,11565000,26565000,49365000,79965000,118365000],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"d:Common:Hadjar":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[[18,23,3,13,8],[21,26,6,16,11],[24,29,9,19,14],[26,31,11,21,16],[29,34,14,24,19],[32,37,17,27,22],[34,39,19,29,24],[37,42,22,32,27],[40,45,25,35,30],[42,47,27,37,32],[45,50,30,40,35]],"tot":[65,80,95,105,120,135,145,160,175,185,200],"team":[65,80,95,105,120,135,145,160,175,185,200],"cu":[0,35000,70000,250000,910000,3100000,7200000,15000000,22800000,30600000,38400000],"ct":[0,35000,105000,355000,1265000,4365000,11565000,26565000,49365000,79965000,118365000],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"d:Common:Hulkenberg":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[[13,18,23,8,3],[16,21,26,11,6],[19,24,29,14,9],[21,26,31,16,11],[24,29,34,19,14],[27,32,37,22,17],[29,34,39,24,19],[32,37,42,27,22],[35,40,45,30,25],[37,42,47,32,27],[40,45,50,35,30]],"tot":[65,80,95,105,120,135,145,160,175,185,200],"team":[65,80,95,105,120,135,145,160,175,185,200],"cu":[0,35000,70000,250000,910000,3100000,7200000,15000000,22800000,30600000,38400000],"ct":[0,35000,105000,355000,1265000,4365000,11565000,26565000,49365000,79965000,118365000],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"d:Common:Lawson":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[[23,3,13,8,18],[26,6,16,11,21],[29,9,19,14,24],[31,11,21,16,26],[34,14,24,19,29],[37,17,27,22,32],[39,19,29,24,34],[42,22,32,27,37],[45,25,35,30,40],[47,27,37,32,42],[50,30,40,35,45]],"tot":[65,80,95,105,120,135,145,160,175,185,200],"team":[65,80,95,105,120,135,145,160,175,185,200],"cu":[0,35000,70000,250000,910000,3100000,7200000,15000000,22800000,30600000,38400000],"ct":[0,35000,105000,355000,1265000,4365000,11565000,26565000,49365000,79965000,118365000],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"d:Common:Albon":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[[8,28,23,13,18],[11,30,25,16,19],[14,33,27,20,21],[17,36,29,24,23],[20,38,31,27,24],[24,41,34,31,26],[27,44,36,35,28],[30,46,38,38,29],[33,49,40,42,31],[36,52,42,46,33],[40,55,45,50,35]],"tot":[90,101,115,129,140,156,170,181,195,209,225],"team":[90,101,115,129,140,156,170,181,195,209,225],"cu":[0,110000,220000,330000,3300000,7900000,17000000,34000000,51000000,68000000,85000000],"ct":[0,110000,330000,660000,3960000,11860000,28860000,62860000,113860000,181860000,266860000],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"d:Common:Alonso":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[[28,13,8,23,18],[30,15,10,25,20],[33,18,13,28,23],[36,21,16,31,26]],"tot":[90,100,115,130],"team":[90,100,115,130],"cu":[0,110000,220000,330000],"ct":[0,110000,330000,660000],"ku":[0,4,10,20],"kt":[0,4,14,34]},"d:Common:Sainz":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Common:Antonelli":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Common:Perez":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Common:Hamilton":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Common:Leclerc":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Common:Russell":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Common:Piastri":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Common:Verstappen":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Common:Norris":{"r":"Common","g":"Common","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Bortoleto":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Bottas":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Colapinto":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Lindblad":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Gasly":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Stroll":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Ocon":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Lawson":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Bearman":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Hadjar":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Hulkenberg":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Alonso":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Sainz":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Albon":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Antonelli":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Perez":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Hamilton":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Leclerc":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Russell":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Piastri":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Verstappen":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Rare:Norris":{"r":"Rare","g":"Rare","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Gasly":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Lindblad":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Bottas":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Colapinto":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Lawson":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Bortoleto":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Stroll":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Ocon":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Hulkenberg":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Albon":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Perez":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Bearman":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Hadjar":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Alonso":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Sainz":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Antonelli":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Hamilton":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Leclerc":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Russell":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Piastri":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Verstappen":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Epic:Norris":{"r":"Epic","g":"Epic","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:Fisichella":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:McLaren":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:G.Villeneuve":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:Webber":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:Berger":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:Massa":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:Coulthard":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:Rindt":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:Hunt":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:J.Villeneuve":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:Andretti":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:Button":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:D.Hill":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:Mansell":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:G.Hill":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:Fittipaldi":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:Lauda":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:Brabham":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:Fangio":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:Prost":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:Schumacher":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"d:Legendary:Senna":{"r":"Legendary","g":"Legendary","k":"d","n":["overtaking","defending","qualifying","raceStart","tyreUse"],"s":[],"tot":[],"team":[],"cu":[],"ct":[],"ku":[],"kt":[]},"c:Battery:Power Grid":{"r":"Common","g":"Battery","k":"c","n":["Speed","Cornering","Power Unit","Qualifying","Pit Time","Overtake M","Impact","Duration","Recharge"],"s":[[9,14,7,8,0.69,12,5,4,3],[10,15,7,8,0.67,15,6,5,4],[10,15,8,9,0.65,17,6,6,5],[11,16,8,9,0.63,18,7,6,5],[11,17,9,10,0.62,21,8,7,6],[12,18,9,10,0.6,24,9,8,7],[12,18,9,10,0.58,26,9,9,8],[13,19,10,11,0.56,29,10,10,9],[13,20,10,11,0.55,30,11,10,9],[14,20,11,12,0.53,32,11,11,10],[14,21,11,12,0.51,35,12,12,11]],"tot":[50,55,59,62,68,73,75,82,84,89,93],"team":[55,60,65,68,75,80,83,90,93,98,103],"cu":[0,3800000,7500000,11000000,15000000,34000000,69000000,150000000,231000000,312000000,393000000],"ct":[0,3800000,11300000,22300000,37300000,71300000,140300000,290300000,521300000,833300000,1226300000],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"c:Brakes:Anchor":{"r":"Common","g":"Brakes","k":"c","n":["Speed","Cornering","Power Unit","Qualifying","Pit Time","Overtake M","Impact","Duration","Recharge"],"s":[[2,2,2,2,0.98,0,0,0,0],[2,2,3,3,0.95,0,0,0,0],[3,3,4,4,0.92,0,0,0,0],[4,4,5,5,0.89,0,0,0,0],[5,5,6,6,0.86,0,0,0,0],[6,5,7,7,0.83,0,0,0,0],[7,6,8,8,0.79,0,0,0,0],[7,7,10,9,0.76,0,0,0,0],[8,8,11,10,0.73,0,0,0,0],[9,8,12,11,0.7,0,0,0,0],[10,9,13,12,0.67,0,0,0,0]],"tot":[8,10,14,18,22,25,29,33,37,40,44],"team":[5,7,12,17,22,26,31,36,41,44,49],"cu":[0,3000,13000,60000,190000,640000,2100000,4700000,7300000,9900000,12500000],"ct":[0,3000,16000,76000,266000,906000,3006000,7706000,15006000,24906000,37406000],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"c:Brakes:Flow 2K":{"r":"Common","g":"Brakes","k":"c","n":["Speed","Cornering","Power Unit","Qualifying","Pit Time","Overtake M","Impact","Duration","Recharge"],"s":[[2,2,5,5,0.97,0,0,0,0],[3,3,6,6,0.94,0,0,0,0],[3,3,7,7,0.91,0,0,0,0],[4,4,8,9,0.88,0,0,0,0],[4,5,9,10,0.85,0,0,0,0],[5,5,10,11,0.83,0,0,0,0],[5,6,11,13,0.8,0,0,0,0],[6,7,13,14,0.77,0,0,0,0],[7,8,14,15,0.74,0,0,0,0],[7,8,15,17,0.71,0,0,0,0],[8,9,16,18,0.69,0,0,0,0]],"tot":[14,18,20,25,28,31,35,40,44,47,51],"team":[11,16,19,24,28,32,37,43,47,51,56],"cu":[0,8600,53000,190000,680000,2300000,5400000,11000000,16600000,22200000,27800000],"ct":[0,8600,61600,251600,931600,3231600,8631600,19631600,36231600,58431600,86231600],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"c:Brakes:Aegis":{"r":"Common","g":"Brakes","k":"c","n":["Speed","Cornering","Power Unit","Qualifying","Pit Time","Overtake M","Impact","Duration","Recharge"],"s":[[12,5,3,4,0.83,0,0,0,0],[14,5,4,5,0.8,0,0,0,0],[16,6,4,5,0.78,0,0,0,0],[18,7,5,6,0.75,0,0,0,0],[20,8,5,6,0.73,0,0,0,0],[22,8,6,7,0.7,0,0,0,0],[23,9,7,8,0.68,0,0,0,0],[25,10,7,8,0.65,0,0,0,0],[27,11,8,9,0.63,0,0,0,0],[29,11,8,9,0.6,0,0,0,0],[31,12,9,10,0.58,0,0,0,0]],"tot":[24,28,31,36,39,43,47,50,55,57,62],"team":[25,30,33,39,43,47,52,56,61,64,70],"cu":[0,110000,220000,330000,3300000,7900000,17000000,34000000,51000000,68000000,85000000],"ct":[0,110000,330000,660000,3960000,11860000,28860000,62860000,113860000,181860000,266860000],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"c:Engine:Bedrock":{"r":"Common","g":"Engine","k":"c","n":["Speed","Cornering","Power Unit","Qualifying","Pit Time","Overtake M","Impact","Duration","Recharge"],"s":[[4,5,3,6,0.88,0,0,0,0],[5,6,4,7,0.84,0,0,0,0],[6,7,5,8,0.8,0,0,0,0],[7,8,6,9,0.77,0,0,0,0],[8,8,7,10,0.73,0,0,0,0],[9,9,8,11,0.69,0,0,0,0],[9,10,8,12,0.66,0,0,0,0],[10,11,9,13,0.62,0,0,0,0],[11,12,10,14,0.58,0,0,0,0],[12,13,11,15,0.55,0,0,0,0],[13,14,12,16,0.51,0,0,0,0]],"tot":[18,22,26,30,33,37,39,43,47,51,55],"team":[17,23,28,33,37,42,45,50,55,60,65],"cu":[0,35000,70000,250000,910000,3100000,7200000,15000000,22800000,30600000,38400000],"ct":[0,35000,105000,355000,1265000,4365000,11565000,26565000,49365000,79965000,118365000],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"c:Engine:Velocity":{"r":"Common","g":"Engine","k":"c","n":["Speed","Cornering","Power Unit","Qualifying","Pit Time","Overtake M","Impact","Duration","Recharge"],"s":[[15,5,6,7,0.79,0,0,0,0],[17,6,7,8,0.77,0,0,0,0],[19,6,7,8,0.74,0,0,0,0],[21,7,8,9,0.72,0,0,0,0],[23,7,9,9,0.69,0,0,0,0],[25,8,9,10,0.67,0,0,0,0],[26,9,10,11,0.64,0,0,0,0],[28,9,10,11,0.62,0,0,0,0],[30,10,11,12,0.59,0,0,0,0],[32,10,12,12,0.57,0,0,0,0],[34,11,12,13,0.55,0,0,0,0]],"tot":[33,38,40,45,48,52,56,58,63,66,70],"team":[35,41,43,49,53,57,62,65,71,74,79],"cu":[0,400000,810000,1200000,4400000,11000000,39000000,82000000,125000000,168000000,211000000],"ct":[0,400000,1210000,2410000,6810000,17810000,56810000,138810000,263810000,431810000,642810000],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"c:Front Wing:Wind Guard":{"r":"Common","g":"Front Wing","k":"c","n":["Speed","Cornering","Power Unit","Qualifying","Pit Time","Overtake M","Impact","Duration","Recharge"],"s":[[2,3,2,1,0.98,0,0,0,0],[2,4,3,2,0.95,0,0,0,0],[3,5,4,3,0.92,0,0,0,0],[4,5,5,5,0.89,0,0,0,0],[5,6,6,6,0.86,0,0,0,0],[5,7,7,7,0.83,0,0,0,0],[6,8,8,8,0.8,0,0,0,0],[7,9,10,9,0.77,0,0,0,0],[8,9,11,11,0.74,0,0,0,0],[8,10,12,12,0.71,0,0,0,0],[9,11,13,13,0.69,0,0,0,0]],"tot":[8,11,15,19,23,26,30,35,39,42,46],"team":[5,8,13,18,23,27,32,38,42,46,51],"cu":[0,3000,13000,60000,190000,640000,2100000,4700000,7300000,9900000,12500000],"ct":[0,3000,16000,76000,266000,906000,3006000,7706000,15006000,24906000,37406000],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"c:Front Wing:Laminar":{"r":"Common","g":"Front Wing","k":"c","n":["Speed","Cornering","Power Unit","Qualifying","Pit Time","Overtake M","Impact","Duration","Recharge"],"s":[[3,9,2,4,0.86,0,0,0,0],[4,11,3,5,0.84,0,0,0,0],[4,13,3,5,0.81,0,0,0,0],[5,14,4,6,0.79,0,0,0,0],[6,16,5,7,0.76,0,0,0,0],[7,18,6,8,0.74,0,0,0,0],[7,20,6,8,0.71,0,0,0,0],[8,22,7,9,0.69,0,0,0,0],[9,23,8,10,0.66,0,0,0,0],[9,25,8,10,0.64,0,0,0,0],[10,27,9,11,0.62,0,0,0,0]],"tot":[18,23,25,29,34,39,41,46,50,52,57],"team":[18,24,26,31,37,42,45,51,56,58,64],"cu":[0,35000,70000,250000,910000,3100000,7200000,15000000,22800000,30600000,38400000],"ct":[0,35000,105000,355000,1265000,4365000,11565000,26565000,49365000,79965000,118365000],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"c:Front Wing:Scythe":{"r":"Common","g":"Front Wing","k":"c","n":["Speed","Cornering","Power Unit","Qualifying","Pit Time","Overtake M","Impact","Duration","Recharge"],"s":[[5,9,6,11,0.79,0,0,0,0],[5,10,7,13,0.77,0,0,0,0],[6,12,7,14,0.74,0,0,0,0],[7,13,8,15,0.72,0,0,0,0],[7,14,9,17,0.69,0,0,0,0],[8,16,10,18,0.67,0,0,0,0],[8,17,10,19,0.64,0,0,0,0],[9,18,11,21,0.62,0,0,0,0],[10,19,12,22,0.59,0,0,0,0],[10,21,12,23,0.57,0,0,0,0],[11,22,13,25,0.55,0,0,0,0]],"tot":[31,35,39,43,47,52,54,59,63,66,71],"team":[33,38,42,47,52,57,60,66,71,74,80],"cu":[0,400000,810000,1200000,4400000,11000000,39000000,82000000,125000000,168000000,211000000],"ct":[0,400000,1210000,2410000,6810000,17810000,56810000,138810000,263810000,431810000,642810000],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"c:Gearbox:Cadence":{"r":"Common","g":"Gearbox","k":"c","n":["Speed","Cornering","Power Unit","Qualifying","Pit Time","Overtake M","Impact","Duration","Recharge"],"s":[[2,2,2,2,0.98,0,0,0,0],[3,2,2,3,0.95,0,0,0,0],[4,3,3,4,0.92,0,0,0,0],[5,4,4,5,0.89,0,0,0,0],[6,5,5,6,0.86,0,0,0,0],[7,6,5,8,0.83,0,0,0,0],[8,7,6,9,0.79,0,0,0,0],[9,7,7,10,0.76,0,0,0,0],[10,8,8,11,0.73,0,0,0,0],[11,9,8,12,0.7,0,0,0,0],[12,10,9,13,0.67,0,0,0,0]],"tot":[8,10,14,18,22,26,30,33,37,40,44],"team":[5,7,12,17,22,27,32,36,41,44,49],"cu":[0,3000,13000,60000,190000,640000,2100000,4700000,7300000,9900000,12500000],"ct":[0,3000,16000,76000,266000,906000,3006000,7706000,15006000,24906000,37406000],"ku":[0,4,10,20,50,100,200,400,1000,2000,4000],"kt":[0,4,14,34,84,184,384,784,1784,3784,7784]},"c:Gearbox:Flow Logic":{"r":"Common","g":"Gearbox","k":"c","n":["Speed","Cornering","Power Unit","Qualifying","Pit Time","Overtake M","Impact","Duration","Recharge"],"s":[[2,3,5,2,0.9,0,0,0,0],[3,4,6,3,0.85,0,0,0,0],[3,4,7,3,0.81,0,0,0,0],[4,5,9,4,0.77,0,0,0,0],[4,6,10,5,0.73,0,0,0,0],[5,7,11,5,0.69,0,0,0,0],[5,7,13,6,0.64,0,0,0,0]],"tot":[12,16,17,22,25,28,31],"team":[11,16,18,25,29,33,37],"cu":[0,8600,53000,190000,680000,2300000,5400000],"ct":[0,8600,61600,251600,931600,3231600,8631600],"ku":[0,4,10,20,50,100,200],"kt":[0,4,14,34,84,184,384]}};
+
 /* ---------- State ---------- */
 let overrides = {};        // { id: {level, amount} }
 let tab = "drivers";       // "drivers" | "components"
@@ -433,7 +471,8 @@ function effective(tabName, groupName, seed){
   let amount = Number.isFinite(o.amount) ? o.amount : seed.amount;
   level = clamp(Math.round(level), 0, cap);
   amount = Math.max(0, Math.round(amount));
-  return { id, name:seed.name, rarity:seed.rarity, group:groupName, level, amount, cap };
+  return { id, k: tabName === "drivers" ? "d" : "c",
+           name:seed.name, rarity:seed.rarity, group:groupName, level, amount, cap };
 }
 function clamp(n,lo,hi){ return Math.min(hi, Math.max(lo, n)); }
 
@@ -477,27 +516,81 @@ function pct(card){
   return { p: Math.min(card.amount / cost, 1), cost };
 }
 
-function cardHTML(c){
+/* ----- Reference-data accessors + upgrade math ----- */
+// Coins to go from `level` to `level+1` (null if unknown / at data cap).
+function coinToNext(id, level){
+  const r = REF[id]; if(!r) return null;
+  return (level >= 1 && level < r.cu.length) ? r.cu[level] : null;
+}
+// Cards remaining to reach cap from current level, minus cards already banked.
+function cardsToMax(level, cap, amount){
+  let sum = 0;
+  for(let k = level; k < cap; k++) sum += (COST[k] || 0);
+  return Math.max(0, sum - Math.max(0, amount));
+}
+// Coins to reach cap from current level (null if this card has no cost data).
+function coinsToMax(id, level, cap){
+  const r = REF[id]; if(!r) return null;
+  let sum = 0;
+  for(let k = level; k < cap && k < r.cu.length; k++) sum += (r.cu[k] || 0);
+  return sum;
+}
+// Stats/Total/Team at a given level (null if none).
+function statsAt(id, level){
+  const r = REF[id]; if(!r || level < 1 || level > r.s.length) return null;
+  return { names:r.n, vals:r.s[level-1], total:r.tot[level-1], team:r.team[level-1] };
+}
+
+function progressHTML(c){
   const prog = pct(c);
-  const dim = (c.level === 0 && c.amount === 0);
-  let body;
   if(prog === null){
-    body = `<div class="maxrow">★ MAX <span style="color:var(--muted);font-weight:600;margin-left:auto">Lv ${c.cap}</span></div>`;
-  }else{
-    const w = Math.round(prog.p * 100);
-    const label = prog.cost
-      ? `${fmt(Math.min(c.amount,prog.cost))} / ${fmt(prog.cost)}`
-      : `Lv 0 &middot; ${fmt(c.amount)} cards`;
-    body = `<div class="barwrap">
-        <div class="bar"><i style="width:${w}%"></i></div>
-        <div class="barlabel"><span>To Lv ${c.level+1}</span><span>${label}</span></div>
-      </div>`;
+    return `<div class="maxrow">★ MAX <span class="muted" style="margin-left:auto">Lv ${c.cap}</span></div>`;
   }
-  return `<div class="card${dim?' dim':''}" data-id="${esc(c.id)}"
-      data-level="${c.level}" data-amount="${c.amount}"
-      data-seedlevel="${c.seedLevel}" data-seedamount="${c.seedAmount}"
-      data-cap="${c.cap}">
-    <div class="top">
+  const w = Math.round(prog.p * 100);
+  const coin = coinToNext(c.id, c.level);
+  const cardPart = prog.cost ? `${fmt(Math.min(c.amount,prog.cost))} / ${fmt(prog.cost)} cards`
+                             : `${fmt(c.amount)} cards`;
+  const coinPart = coin ? ` &middot; ${fmtCoins(coin)} coins` : "";
+  return `<div class="barwrap">
+      <div class="bar"><i style="width:${w}%"></i></div>
+      <div class="barlabel"><span>To Lv ${c.level+1}</span><span>${cardPart}${coinPart}</span></div>
+    </div>`;
+}
+
+// Collapsible stats + "to max" plan panel.
+function detailsHTML(c){
+  const st = statsAt(c.id, c.level);
+  const toMaxCards = cardsToMax(c.level, c.cap, c.amount);
+  const toMaxCoins = coinsToMax(c.id, c.level, c.cap);
+  const atMax = c.level >= c.cap;
+
+  let statRows = "";
+  if(st){
+    const items = st.names
+      .map((n,i) => ({n, v:st.vals[i]}))
+      .filter(x => c.k === "d" || x.v);           // components: show only used stats
+    statRows = `<div class="stats">` + items.map(x =>
+      `<div class="stat"><span>${esc(x.n)}</span><b>${fmt(x.v)}</b></div>`).join("") + `</div>`;
+    statRows += `<div class="stat total"><span>Total / Team Score</span><b>${fmt(st.total)} / ${fmt(st.team)}</b></div>`;
+  }else if(!REF[c.id]){
+    statRows = `<div class="muted small">Stat data not published for this component in the source sheet.</div>`;
+  }else{
+    statRows = `<div class="muted small">No stats yet — unlock this card to see them.</div>`;
+  }
+
+  const planRows = `<div class="plan">
+    ${atMax ? `<div class="planrow"><span>Status</span><b class="gold">★ Maxed</b></div>`
+            : `<div class="planrow"><span>To max (Lv ${c.cap})</span><b>${fmt(toMaxCards)} cards${toMaxCoins!=null?` &middot; ${fmtCoins(toMaxCoins)} coins`:""}</b></div>`}
+  </div>`;
+
+  return `<details class="det">
+    <summary>Stats &amp; costs</summary>
+    ${statRows}${planRows}
+  </details>`;
+}
+
+function cardInner(c){
+  return `<div class="top">
       <span class="name">${esc(c.name)}</span>
       <span class="badge ${esc(c.rarity)}">${esc(c.rarity)}</span>
     </div>
@@ -513,8 +606,27 @@ function cardHTML(c){
           value="${c.amount}" data-act="amt" aria-label="Card count for ${esc(c.name)}">
       </div>
     </div>
-    ${body}
-  </div>`;
+    ${progressHTML(c)}
+    ${detailsHTML(c)}`;
+}
+
+function cardHTML(c){
+  const dim = (c.level === 0 && c.amount === 0);
+  return `<div class="card${dim?' dim':''}" data-id="${esc(c.id)}"
+      data-level="${c.level}" data-amount="${c.amount}" data-kind="${c.k}"
+      data-seedlevel="${c.seedLevel}" data-seedamount="${c.seedAmount}"
+      data-cap="${c.cap}">${cardInner(c)}</div>`;
+}
+
+// Rebuild a live card object from its DOM dataset (for in-place refresh).
+function cardFromEl(card){
+  const id = card.dataset.id;
+  return {
+    id, k: card.dataset.kind,
+    name: card.querySelector(".name").textContent,
+    rarity: (REF[id] && REF[id].r) || (card.querySelector(".badge").textContent),
+    level: +card.dataset.level, amount: +card.dataset.amount, cap: +card.dataset.cap
+  };
 }
 
 function render(){
@@ -539,10 +651,44 @@ function render(){
       <div class="cards">${cards.map(cardHTML).join("")}</div></section>`;
   }
 
-  app.innerHTML = html + toolbarHTML();
+  app.innerHTML = summaryHTML() + html + toolbarHTML();
   if(total === 0){
-    app.innerHTML = `<div class="empty">No cards match “${esc(query)}”.</div>` + toolbarHTML();
+    app.innerHTML = summaryHTML() + `<div class="empty">No cards match “${esc(query)}”.</div>` + toolbarHTML();
   }
+}
+
+// Collection-wide "to max" totals for the ACTIVE tab (ignores search/filter).
+function tabTotals(){
+  let cards = 0, coins = 0, maxed = 0, count = 0;
+  for(const g of groupsFor(tab)){
+    for(const seed of seedList(tab, g)){
+      const c = effective(tab, g, seed);
+      count++;
+      if(c.level >= c.cap){ maxed++; continue; }
+      cards += cardsToMax(c.level, c.cap, c.amount);
+      const cn = coinsToMax(c.id, c.level, c.cap);
+      if(cn != null) coins += cn;
+    }
+  }
+  return { cards, coins, maxed, count };
+}
+
+function summaryHTML(){
+  const t = tabTotals();
+  const label = tab === "drivers" ? "Drivers" : "Components";
+  return `<div class="summary" id="summary">
+    <div class="sum-title">${label} · to max everything</div>
+    <div class="sum-grid">
+      <div class="sum"><b>${fmt(t.cards)}</b><small>cards left</small></div>
+      <div class="sum"><b>${fmtCoins(t.coins)}</b><small>coins left</small></div>
+      <div class="sum"><b>${t.maxed}/${t.count}</b><small>maxed</small></div>
+    </div>
+  </div>`;
+}
+
+function updateSummary(){
+  const el = document.getElementById("summary");
+  if(el) el.outerHTML = summaryHTML();
 }
 
 function toolbarHTML(){
@@ -579,7 +725,7 @@ app.addEventListener("input", (e) => {
   let amount = Math.max(0, Math.floor(+input.value || 0));
   setOverride(card.dataset.id, +card.dataset.seedlevel, +card.dataset.seedamount, {amount});
   card.dataset.amount = amount;
-  updateBar(card);          // live bar update without stealing focus
+  refreshAmount(card);      // live update without stealing input focus
 });
 app.addEventListener("change", (e) => {
   const input = e.target.closest('input[data-act="amt"]');
@@ -587,45 +733,46 @@ app.addEventListener("change", (e) => {
   input.value = Math.max(0, Math.floor(+input.value || 0));  // normalize display
 });
 
-// Re-render one card's steppers + bar after a level change.
+// After a LEVEL change: fully rebuild the card body (level changes stats,
+// progress and plan). Preserve the details panel's open state.
 function updateCard(card){
   const id = card.dataset.id;
-  const seed = { name:"", rarity:"", level:+card.dataset.seedlevel, amount:+card.dataset.seedamount };
-  // recompute from overrides
   const o = overrides[id] || {};
   const cap = +card.dataset.cap;
-  const level = clamp(Number.isFinite(o.level)?o.level:seed.level, 0, cap);
-  const amount = Number.isFinite(o.amount)?o.amount:seed.amount;
+  const level = clamp(Number.isFinite(o.level)?o.level:+card.dataset.seedlevel, 0, cap);
+  const amount = Number.isFinite(o.amount)?o.amount:+card.dataset.seedamount;
   card.dataset.level = level; card.dataset.amount = amount;
-  card.querySelector(".lvlnum b").textContent = level;
-  card.querySelector('[data-act="dec"]').disabled = level<=0;
-  card.querySelector('[data-act="inc"]').disabled = level>=cap;
+  const wasOpen = card.querySelector(".det") && card.querySelector(".det").open;
+  card.innerHTML = cardInner(cardFromEl(card));
+  if(wasOpen){ const d = card.querySelector(".det"); if(d) d.open = true; }
   card.classList.toggle("dim", level===0 && amount===0);
-  updateBar(card);
+  updateSummary();
 }
 
-function updateBar(card){
-  const level = +card.dataset.level, amount = +card.dataset.amount, cap = +card.dataset.cap;
-  const c = { level, amount, cap };
+// After an AMOUNT edit: patch only the figures that depend on card count,
+// so the numeric input keeps focus and the details panel stays open.
+function refreshAmount(card){
+  const c = cardFromEl(card);
   const prog = pct(c);
-  // Rebuild the progress area: remove existing progress nodes, keep .row.
-  card.querySelectorAll(":scope > .barwrap, :scope > .maxrow").forEach(n=>n.remove());
-  let node;
-  if(prog === null){
-    node = document.createElement("div");
-    node.className = "maxrow";
-    node.innerHTML = `★ MAX <span style="color:var(--muted);font-weight:600;margin-left:auto">Lv ${cap}</span>`;
-  }else{
-    const w = Math.round(prog.p*100);
-    const label = prog.cost
-      ? `${fmt(Math.min(amount,prog.cost))} / ${fmt(prog.cost)}`
-      : `Lv 0 &middot; ${fmt(amount)} cards`;
-    node = document.createElement("div");
-    node.className = "barwrap";
-    node.innerHTML = `<div class="bar"><i style="width:${w}%"></i></div>
-      <div class="barlabel"><span>To Lv ${level+1}</span><span>${label}</span></div>`;
+  const bw = card.querySelector(".barwrap");
+  if(prog && bw){
+    const i = bw.querySelector(".bar > i");
+    if(i) i.style.width = Math.round(prog.p*100) + "%";
+    const coin = coinToNext(c.id, c.level);
+    const cardPart = prog.cost ? `${fmt(Math.min(c.amount,prog.cost))} / ${fmt(prog.cost)} cards`
+                               : `${fmt(c.amount)} cards`;
+    const coinPart = coin ? ` &middot; ${fmtCoins(coin)} coins` : "";
+    const lbl = bw.querySelector(".barlabel span:last-child");
+    if(lbl) lbl.innerHTML = cardPart + coinPart;
   }
-  card.appendChild(node);
+  const planB = card.querySelector(".plan .planrow b");
+  if(planB && c.level < c.cap){
+    const toMaxCoins = coinsToMax(c.id, c.level, c.cap);
+    planB.innerHTML = `${fmt(cardsToMax(c.level, c.cap, c.amount))} cards`
+      + (toMaxCoins!=null ? ` &middot; ${fmtCoins(toMaxCoins)} coins` : "");
+  }
+  card.classList.toggle("dim", c.level===0 && c.amount===0);
+  updateSummary();
 }
 
 /* ---------- Tools: export / import / reset ---------- */
@@ -746,6 +893,16 @@ function toast(msg){
 function esc(s){ return String(s).replace(/[&<>"']/g, c =>
   ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function fmt(n){ return Number(n).toLocaleString("en-US"); }
+// Compact coin formatting: 12,500,000 -> "12.5M", 1,226,300,000 -> "1.23B".
+function fmtCoins(n){
+  n = Number(n) || 0;
+  const sign = n < 0 ? "-" : ""; n = Math.abs(n);
+  const trim = (x) => x.toFixed(2).replace(/\.?0+$/, "");
+  if(n >= 1e9) return sign + trim(n/1e9) + "B";
+  if(n >= 1e6) return sign + trim(n/1e6) + "M";
+  if(n >= 1e3) return sign + trim(n/1e3) + "K";
+  return sign + n.toLocaleString("en-US");
+}
 
 /* ---------- Boot ---------- */
 load();
