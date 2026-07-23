@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>F1 Clash Resource Sheet</title>
+<meta name="description" content="Offline tracker for F1 Clash driver and component levels and card counts.">
+<meta name="theme-color" content="#0b0f1a">
+<meta name="color-scheme" content="dark light">
+<link rel="manifest" href="manifest.webmanifest">
+<!-- iOS PWA -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="F1 Clash">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<style>
+  :root{
+    --bg:#0b0f1a; --surface:#141a29; --surface-2:#1c2436; --line:#2a3348;
+    --text:#eaf0ff; --muted:#9aa6c2; --red:#e10600; --red-ink:#ffffff;
+    --accent:#3aa0ff; --ok:#37d38a; --gold:#ffcf4d;
+    --common:#8fb4d6; --rare:#4d8bff; --epic:#b06bff; --legendary:#ffcf4d;
+    --radius:14px; --tap:42px;
+    --safe-t:env(safe-area-inset-top); --safe-b:env(safe-area-inset-bottom);
+    --safe-l:env(safe-area-inset-left); --safe-r:env(safe-area-inset-right);
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#eef1f7; --surface:#ffffff; --surface-2:#f2f5fb; --line:#d7deec;
+      --text:#101625; --muted:#556080;
+      --common:#3f6f9c; --rare:#2f5fd0; --epic:#7d3fd0; --legendary:#b8860b;
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg); color:var(--text);
+    font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-text-size-adjust:100%; overflow-x:hidden;
+    padding:0 var(--safe-r) var(--safe-b) var(--safe-l);
+  }
+  button{font:inherit; color:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent}
+  input{font:inherit}
+
+  header{
+    position:sticky; top:0; z-index:20;
+    background:linear-gradient(180deg, rgba(11,15,26,.98), rgba(11,15,26,.94));
+    backdrop-filter:saturate(1.2) blur(6px);
+    border-bottom:1px solid var(--line);
+    padding:calc(var(--safe-t) + 10px) 12px 8px;
+  }
+  @media (prefers-color-scheme: light){
+    header{background:linear-gradient(180deg, rgba(238,241,247,.98), rgba(238,241,247,.94))}
+  }
+  .brand{display:flex; align-items:center; gap:10px; margin-bottom:8px}
+  .logo{
+    width:30px; height:30px; border-radius:8px; background:var(--red);
+    display:grid; place-items:center; flex:0 0 auto;
+  }
+  .logo svg{width:18px; height:18px}
+  .title{font-weight:800; letter-spacing:.2px; font-size:18px; flex:1 1 auto;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .title small{display:block; font-weight:600; font-size:11px; color:var(--muted)}
+  #install{
+    display:none; border:1px solid var(--line); background:var(--surface-2);
+    border-radius:10px; padding:8px 12px; min-height:var(--tap); font-weight:700; font-size:13px;
+  }
+  #install:active{transform:scale(.96)}
+  #install.show{display:inline-flex; align-items:center; gap:6px}
+
+  .search{
+    display:flex; align-items:center; gap:8px; background:var(--surface);
+    border:1px solid var(--line); border-radius:12px; padding:0 10px; margin-bottom:8px;
+  }
+  .search svg{width:16px;height:16px;opacity:.7;flex:0 0 auto}
+  .search input{
+    flex:1; background:transparent; border:0; outline:none; color:var(--text);
+    padding:11px 2px; min-height:var(--tap);
+  }
+  .search .clear{
+    border:0;background:transparent;color:var(--muted);font-size:20px;line-height:1;
+    padding:6px 4px;min-width:32px;
+  }
+
+  .tabs{display:flex; gap:6px; background:var(--surface); border:1px solid var(--line);
+    border-radius:12px; padding:4px}
+  .tabs button{
+    flex:1; border:0; background:transparent; border-radius:9px; padding:10px;
+    min-height:var(--tap); font-weight:700; color:var(--muted);
+  }
+  .tabs button[aria-selected="true"]{background:var(--red); color:var(--red-ink)}
+  .tabs button:active{transform:scale(.98)}
+
+  .chips{
+    display:flex; gap:8px; overflow-x:auto; padding:10px 12px; margin:0;
+    -webkit-overflow-scrolling:touch; scrollbar-width:none;
+    position:sticky; top:0; z-index:10;
+  }
+  .chips::-webkit-scrollbar{display:none}
+  .chip{
+    flex:0 0 auto; border:1px solid var(--line); background:var(--surface);
+    color:var(--muted); border-radius:999px; padding:8px 14px; min-height:38px;
+    font-size:13px; font-weight:700; white-space:nowrap;
+  }
+  .chip[aria-pressed="true"]{background:var(--surface-2); color:var(--text); border-color:var(--accent)}
+  .chip:active{transform:scale(.96)}
+
+  main{padding:4px 12px 28px; max-width:760px; margin:0 auto}
+  .group{margin:14px 0 4px}
+  .group h2{
+    display:flex; align-items:center; gap:8px; font-size:13px; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--muted); margin:0 2px 8px; font-weight:800;
+  }
+  .group h2 .count{margin-left:auto; font-weight:700; color:var(--muted)}
+  .cards{display:grid; grid-template-columns:1fr; gap:10px}
+  @media (min-width:520px){.cards{grid-template-columns:1fr 1fr}}
+
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:12px; display:flex; flex-direction:column; gap:10px;
+  }
+  .card.dim{opacity:.55}
+  .card .top{display:flex; align-items:center; gap:8px}
+  .name{font-weight:800; font-size:16px; flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .badge{
+    font-size:10px; font-weight:900; letter-spacing:.06em; text-transform:uppercase;
+    padding:3px 8px; border-radius:999px; color:#0b0f1a; flex:0 0 auto;
+  }
+  .badge.Common{background:var(--common)}
+  .badge.Rare{background:var(--rare); color:#fff}
+  .badge.Epic{background:var(--epic); color:#fff}
+  .badge.Legendary{background:var(--legendary)}
+
+  .row{display:flex; align-items:center; gap:10px}
+  .lvl{display:flex; align-items:center; gap:8px}
+  .step{
+    width:var(--tap); height:var(--tap); border-radius:10px; border:1px solid var(--line);
+    background:var(--surface-2); font-size:22px; font-weight:800; display:grid; place-items:center;
+  }
+  .step:active{transform:scale(.94); background:var(--red); color:var(--red-ink)}
+  .step[disabled]{opacity:.35; pointer-events:none}
+  .lvlnum{min-width:78px; text-align:center}
+  .lvlnum b{font-size:20px}
+  .lvlnum small{display:block; font-size:10px; color:var(--muted); letter-spacing:.06em; text-transform:uppercase}
+
+  .amt{margin-left:auto; display:flex; align-items:center; gap:6px}
+  .amt label{font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em}
+  .amt input{
+    width:88px; text-align:right; background:var(--surface-2); color:var(--text);
+    border:1px solid var(--line); border-radius:10px; padding:9px 10px; min-height:var(--tap);
+  }
+  .amt input:focus{outline:2px solid var(--accent); outline-offset:1px}
+
+  .bar{height:8px; border-radius:999px; background:var(--surface-2); overflow:hidden; border:1px solid var(--line)}
+  .bar>i{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--accent),var(--ok)); transition:width .18s ease}
+  .barwrap{display:flex; flex-direction:column; gap:5px}
+  .barlabel{display:flex; justify-content:space-between; font-size:11px; color:var(--muted)}
+  .maxrow{display:flex; align-items:center; gap:6px; color:var(--gold); font-weight:800; font-size:13px}
+
+  .toolbar{
+    display:flex; gap:8px; flex-wrap:wrap; margin:16px 2px 4px;
+  }
+  .toolbar button{
+    flex:1 1 auto; min-width:96px; min-height:var(--tap);
+    border:1px solid var(--line); background:var(--surface); border-radius:12px;
+    padding:10px; font-weight:700; font-size:13px;
+  }
+  .toolbar button:active{transform:scale(.98)}
+  .toolbar button.danger{color:var(--red); border-color:var(--red)}
+  .empty{text-align:center; color:var(--muted); padding:40px 10px}
+
+  footer{color:var(--muted); font-size:11px; text-align:center; padding:18px 12px 30px; line-height:1.6}
+  .toast{
+    position:fixed; left:50%; bottom:calc(20px + var(--safe-b)); transform:translateX(-50%) translateY(20px);
+    background:var(--surface-2); color:var(--text); border:1px solid var(--line);
+    padding:10px 16px; border-radius:12px; font-size:14px; font-weight:600;
+    opacity:0; pointer-events:none; transition:.22s; z-index:50; max-width:90vw; text-align:center;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <span class="logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M5 5l14 14M19 5L5 19"/>
+      </svg>
+    </span>
+    <span class="title">F1 Clash Resource Sheet<small>Levels &amp; card counts &middot; offline</small></span>
+    <button id="install" type="button" title="Install app">Install</button>
+  </div>
+
+  <div class="search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+    <input id="search" type="search" inputmode="search" autocomplete="off" placeholder="Search by name…" aria-label="Search by name">
+    <button class="clear" id="clear" type="button" aria-label="Clear search" hidden>&times;</button>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Category">
+    <button role="tab" id="tab-drivers" aria-selected="true" data-tab="drivers">Drivers</button>
+    <button role="tab" id="tab-components" aria-selected="false" data-tab="components">Components</button>
+  </div>
+</header>
+
+<nav class="chips" id="chips" aria-label="Filter"></nav>
+<main id="app"></main>
+
+<footer>
+  Unofficial companion. Data from the community <b>F1 Clash 2026 Resource Sheet v1.0</b> (TR The Flash).<br>
+  All data stays on this device. Not affiliated with F1, Formula 1, or Hutch Games.
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<input type="file" id="importFile" accept="application/json,.json" hidden>
+
+<script>
+"use strict";
+
+/* ---------- Rules / constants ---------- */
+// card cost to reach the NEXT level, keyed by current level
+const COST = {1:4,2:10,3:20,4:50,5:100,6:200,7:400,8:1000,9:2000,10:4000,11:8000};
+// max level per rarity (Rare caps at 9; adjust if the game changes)
+const CAP  = {Common:11, Rare:9, Epic:7, Legendary:5};
+
+const STORAGE_KEY = "f1sheet.v1";
+const SCHEMA = 1;
+
+const DRIVER_GROUPS = ["Common","Rare","Epic","Legendary"];
+const COMPONENT_GROUPS = ["Front Wing","Brakes","Suspension","Rear Wing","Gearbox","Engine","Battery"];
+
+/* ---------- Seed data ---------- */
+const DEFAULT = {
+  "drivers": {
+    "Common": [
+      {"name":"Lindblad","rarity":"Common","level":7,"amount":2397},
+      {"name":"Colapinto","rarity":"Common","level":7,"amount":2612},
+      {"name":"Bottas","rarity":"Common","level":7,"amount":3131},
+      {"name":"Bortoleto","rarity":"Common","level":8,"amount":1866},
+      {"name":"Gasly","rarity":"Common","level":6,"amount":2647},
+      {"name":"Stroll","rarity":"Common","level":6,"amount":3753},
+      {"name":"Ocon","rarity":"Common","level":6,"amount":2952},
+      {"name":"Lawson","rarity":"Common","level":7,"amount":1938},
+      {"name":"Bearman","rarity":"Common","level":8,"amount":1326},
+      {"name":"Hadjar","rarity":"Common","level":9,"amount":1104},
+      {"name":"Hulkenberg","rarity":"Common","level":6,"amount":3067},
+      {"name":"Alonso","rarity":"Common","level":5,"amount":2055},
+      {"name":"Sainz","rarity":"Common","level":5,"amount":3208},
+      {"name":"Albon","rarity":"Common","level":5,"amount":2631},
+      {"name":"Antonelli","rarity":"Common","level":5,"amount":2912},
+      {"name":"Perez","rarity":"Common","level":5,"amount":2890},
+      {"name":"Hamilton","rarity":"Common","level":4,"amount":2544},
+      {"name":"Leclerc","rarity":"Common","level":4,"amount":2604},
+      {"name":"Russell","rarity":"Common","level":4,"amount":2230},
+      {"name":"Piastri","rarity":"Common","level":3,"amount":2143},
+      {"name":"Verstappen","rarity":"Common","level":4,"amount":2262},
+      {"name":"Norris","rarity":"Common","level":3,"amount":1943}
+    ],
+    "Rare": [
+      {"name":"Bortoleto","rarity":"Rare","level":9,"amount":0},
+      {"name":"Bottas","rarity":"Rare","level":9,"amount":0},
+      {"name":"Colapinto","rarity":"Rare","level":6,"amount":1352},
+      {"name":"Lindblad","rarity":"Rare","level":2,"amount":908},
+      {"name":"Gasly","rarity":"Rare","level":2,"amount":900},
+      {"name":"Stroll","rarity":"Rare","level":2,"amount":1061},
+      {"name":"Ocon","rarity":"Rare","level":1,"amount":421},
+      {"name":"Lawson","rarity":"Rare","level":1,"amount":321},
+      {"name":"Bearman","rarity":"Rare","level":6,"amount":283},
+      {"name":"Hadjar","rarity":"Rare","level":1,"amount":520},
+      {"name":"Hulkenberg","rarity":"Rare","level":1,"amount":342},
+      {"name":"Alonso","rarity":"Rare","level":0,"amount":0},
+      {"name":"Sainz","rarity":"Rare","level":0,"amount":0},
+      {"name":"Albon","rarity":"Rare","level":1,"amount":29},
+      {"name":"Antonelli","rarity":"Rare","level":0,"amount":0},
+      {"name":"Perez","rarity":"Rare","level":0,"amount":0},
+      {"name":"Hamilton","rarity":"Rare","level":0,"amount":0},
+      {"name":"Leclerc","rarity":"Rare","level":0,"amount":0},
+      {"name":"Russell","rarity":"Rare","level":0,"amount":0},
+      {"name":"Piastri","rarity":"Rare","level":0,"amount":0},
+      {"name":"Verstappen","rarity":"Rare","level":0,"amount":0},
+      {"name":"Norris","rarity":"Rare","level":0,"amount":0}
+    ],
+    "Epic": [
+      {"name":"Gasly","rarity":"Epic","level":6,"amount":148},
+      {"name":"Lindblad","rarity":"Epic","level":7,"amount":96},
+      {"name":"Bottas","rarity":"Epic","level":6,"amount":183},
+      {"name":"Colapinto","rarity":"Epic","level":6,"amount":49},
+      {"name":"Lawson","rarity":"Epic","level":0,"amount":0},
+      {"name":"Bortoleto","rarity":"Epic","level":0,"amount":0},
+      {"name":"Stroll","rarity":"Epic","level":0,"amount":0},
+      {"name":"Ocon","rarity":"Epic","level":0,"amount":0},
+      {"name":"Hulkenberg","rarity":"Epic","level":0,"amount":0},
+      {"name":"Albon","rarity":"Epic","level":0,"amount":0},
+      {"name":"Perez","rarity":"Epic","level":0,"amount":0},
+      {"name":"Bearman","rarity":"Epic","level":0,"amount":0},
+      {"name":"Hadjar","rarity":"Epic","level":0,"amount":0},
+      {"name":"Alonso","rarity":"Epic","level":0,"amount":0},
+      {"name":"Sainz","rarity":"Epic","level":0,"amount":0},
+      {"name":"Antonelli","rarity":"Epic","level":0,"amount":0},
+      {"name":"Hamilton","rarity":"Epic","level":0,"amount":0},
+      {"name":"Leclerc","rarity":"Epic","level":0,"amount":0},
+      {"name":"Russell","rarity":"Epic","level":0,"amount":0},
+      {"name":"Piastri","rarity":"Epic","level":0,"amount":0},
+      {"name":"Verstappen","rarity":"Epic","level":0,"amount":0},
+      {"name":"Norris","rarity":"Epic","level":0,"amount":0}
+    ],
+    "Legendary": [
+      {"name":"Fisichella","rarity":"Legendary","level":2,"amount":43},
+      {"name":"McLaren","rarity":"Legendary","level":3,"amount":100},
+      {"name":"G.Villeneuve","rarity":"Legendary","level":1,"amount":29},
+      {"name":"Webber","rarity":"Legendary","level":2,"amount":0},
+      {"name":"Berger","rarity":"Legendary","level":0,"amount":0},
+      {"name":"Massa","rarity":"Legendary","level":2,"amount":3},
+      {"name":"Coulthard","rarity":"Legendary","level":0,"amount":0},
+      {"name":"Rindt","rarity":"Legendary","level":1,"amount":10},
+      {"name":"Hunt","rarity":"Legendary","level":0,"amount":0},
+      {"name":"J.Villeneuve","rarity":"Legendary","level":0,"amount":0},
+      {"name":"Andretti","rarity":"Legendary","level":0,"amount":0},
+      {"name":"Button","rarity":"Legendary","level":0,"amount":0},
+      {"name":"D.Hill","rarity":"Legendary","level":0,"amount":0},
+      {"name":"Mansell","rarity":"Legendary","level":0,"amount":0},
+      {"name":"G.Hill","rarity":"Legendary","level":0,"amount":0},
+      {"name":"Fittipaldi","rarity":"Legendary","level":0,"amount":0},
+      {"name":"Lauda","rarity":"Legendary","level":0,"amount":0},
+      {"name":"Brabham","rarity":"Legendary","level":0,"amount":0},
+      {"name":"Fangio","rarity":"Legendary","level":0,"amount":0},
+      {"name":"Prost","rarity":"Legendary","level":0,"amount":0},
+      {"name":"Schumacher","rarity":"Legendary","level":0,"amount":0},
+      {"name":"Senna","rarity":"Legendary","level":0,"amount":0}
+    ]
+  },
+  "components": {
+    "Front Wing": [
+      {"name":"Wind Guard","rarity":"Common","level":9,"amount":1049},
+      {"name":"Zephyr","rarity":"Rare","level":9,"amount":836},
+      {"name":"Laminar","rarity":"Common","level":9,"amount":1181},
+      {"name":"Scythe","rarity":"Common","level":8,"amount":2010},
+      {"name":"Flashpoint","rarity":"Epic","level":6,"amount":29},
+      {"name":"Leading Edge","rarity":"Rare","level":0,"amount":0},
+      {"name":"Loose Fit","rarity":"Epic","level":0,"amount":0}
+    ],
+    "Brakes": [
+      {"name":"Anchor","rarity":"Common","level":9,"amount":537},
+      {"name":"Flow 2K","rarity":"Common","level":9,"amount":805},
+      {"name":"Aegis","rarity":"Common","level":6,"amount":2602},
+      {"name":"Scramble","rarity":"Rare","level":8,"amount":350},
+      {"name":"Aura Lock","rarity":"Rare","level":0,"amount":0},
+      {"name":"Pressure Point","rarity":"Epic","level":0,"amount":0},
+      {"name":"Stabilix","rarity":"Epic","level":0,"amount":0}
+    ],
+    "Suspension": [
+      {"name":"Shockwave","rarity":"Common","level":9,"amount":1221},
+      {"name":"Jumpstart","rarity":"Common","level":9,"amount":948},
+      {"name":"Stability Unit","rarity":"Common","level":9,"amount":845},
+      {"name":"Equilibrium","rarity":"Rare","level":8,"amount":815},
+      {"name":"Curver 3.0","rarity":"Epic","level":5,"amount":8},
+      {"name":"Motion Link V2","rarity":"Rare","level":0,"amount":0},
+      {"name":"Bounce","rarity":"Epic","level":0,"amount":0}
+    ],
+    "Rear Wing": [
+      {"name":"Wobble","rarity":"Rare","level":9,"amount":502},
+      {"name":"Tailwind","rarity":"Common","level":9,"amount":1222},
+      {"name":"Air Channel","rarity":"Common","level":9,"amount":2577},
+      {"name":"Vibe Lift","rarity":"Common","level":8,"amount":1830},
+      {"name":"Impact","rarity":"Rare","level":7,"amount":8},
+      {"name":"Downforce","rarity":"Epic","level":0,"amount":0},
+      {"name":"Dominus","rarity":"Epic","level":0,"amount":0}
+    ],
+    "Gearbox": [
+      {"name":"Cadence","rarity":"Common","level":9,"amount":741},
+      {"name":"Flow Logic","rarity":"Common","level":9,"amount":1135},
+      {"name":"Stratos","rarity":"Epic","level":7,"amount":24},
+      {"name":"Shift X","rarity":"Rare","level":8,"amount":190},
+      {"name":"Lockdown","rarity":"Rare","level":0,"amount":0},
+      {"name":"Fracture","rarity":"Rare","level":0,"amount":0},
+      {"name":"Powerbox","rarity":"Epic","level":0,"amount":0}
+    ],
+    "Engine": [
+      {"name":"Tempest","rarity":"Epic","level":7,"amount":35},
+      {"name":"Bedrock","rarity":"Common","level":9,"amount":1358},
+      {"name":"Velocity","rarity":"Common","level":8,"amount":1670},
+      {"name":"Axis 3000","rarity":"Rare","level":8,"amount":153},
+      {"name":"DriveOS","rarity":"Rare","level":0,"amount":0},
+      {"name":"Hotfix","rarity":"Rare","level":0,"amount":0},
+      {"name":"Overdrive","rarity":"Epic","level":0,"amount":0}
+    ],
+    "Battery": [
+      {"name":"Charge Core","rarity":"Epic","level":6,"amount":188},
+      {"name":"Power Grid","rarity":"Common","level":6,"amount":1088},
+      {"name":"Energy Reserve","rarity":"Rare","level":0,"amount":0},
+      {"name":"Spare Pack","rarity":"Rare","level":0,"amount":0}
+    ]
+  }
+};
+
+/* ---------- State ---------- */
+let overrides = {};        // { id: {level, amount} }
+let tab = "drivers";       // "drivers" | "components"
+let group = "All";         // active filter chip
+let query = "";            // search text
+
+function load(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return;
+    const data = JSON.parse(raw);
+    // schema guard for safe future migrations
+    if(data && typeof data === "object" && data.schema === SCHEMA && data.overrides){
+      overrides = data.overrides;
+    }
+  }catch(e){ /* corrupt storage -> fall back to seed */ }
+}
+function save(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      schema:SCHEMA, overrides, savedAt:new Date().toISOString()
+    }));
+  }catch(e){ toast("Couldn't save — storage full?"); }
+}
+
+/* ---------- Model helpers ---------- */
+function idFor(tabName, groupName, seed){
+  return (tabName === "drivers" ? "d:" : "c:") + groupName + ":" + seed.name;
+}
+// Effective card = seed + override, plus derived fields.
+function effective(tabName, groupName, seed){
+  const id = idFor(tabName, groupName, seed);
+  const o = overrides[id] || {};
+  const cap = CAP[seed.rarity] ?? 11;
+  let level = Number.isFinite(o.level) ? o.level : seed.level;
+  let amount = Number.isFinite(o.amount) ? o.amount : seed.amount;
+  level = clamp(Math.round(level), 0, cap);
+  amount = Math.max(0, Math.round(amount));
+  return { id, name:seed.name, rarity:seed.rarity, group:groupName, level, amount, cap };
+}
+function clamp(n,lo,hi){ return Math.min(hi, Math.max(lo, n)); }
+
+// Only persist values that differ from the seed (overrides).
+function setOverride(id, seedLevel, seedAmount, patch){
+  const cur = overrides[id] || {};
+  const next = {
+    level: patch.level !== undefined ? patch.level : (cur.level !== undefined ? cur.level : seedLevel),
+    amount: patch.amount !== undefined ? patch.amount : (cur.amount !== undefined ? cur.amount : seedAmount)
+  };
+  if(next.level === seedLevel && next.amount === seedAmount){
+    delete overrides[id];       // back to default -> drop override
+  }else{
+    overrides[id] = next;
+  }
+  save();
+}
+
+function groupsFor(tabName){
+  return tabName === "drivers" ? DRIVER_GROUPS : COMPONENT_GROUPS;
+}
+function seedList(tabName, groupName){
+  return DEFAULT[tabName][groupName] || [];
+}
+
+/* ---------- Rendering ---------- */
+const app = document.getElementById("app");
+const chipsEl = document.getElementById("chips");
+
+function renderChips(){
+  const groups = ["All", ...groupsFor(tab)];
+  chipsEl.innerHTML = groups.map(g =>
+    `<button class="chip" data-group="${esc(g)}" aria-pressed="${g===group}">${esc(g)}</button>`
+  ).join("");
+}
+
+function pct(card){
+  if(card.level >= card.cap) return null;      // MAX
+  const cost = COST[card.level];
+  if(!cost) return { p:0, cost:null };         // unknown cost (e.g. level 0)
+  return { p: Math.min(card.amount / cost, 1), cost };
+}
+
+function cardHTML(c){
+  const prog = pct(c);
+  const dim = (c.level === 0 && c.amount === 0);
+  let body;
+  if(prog === null){
+    body = `<div class="maxrow">★ MAX <span style="color:var(--muted);font-weight:600;margin-left:auto">Lv ${c.cap}</span></div>`;
+  }else{
+    const w = Math.round(prog.p * 100);
+    const label = prog.cost
+      ? `${fmt(Math.min(c.amount,prog.cost))} / ${fmt(prog.cost)}`
+      : `Lv 0 &middot; ${fmt(c.amount)} cards`;
+    body = `<div class="barwrap">
+        <div class="bar"><i style="width:${w}%"></i></div>
+        <div class="barlabel"><span>To Lv ${c.level+1}</span><span>${label}</span></div>
+      </div>`;
+  }
+  return `<div class="card${dim?' dim':''}" data-id="${esc(c.id)}"
+      data-level="${c.level}" data-amount="${c.amount}"
+      data-seedlevel="${c.seedLevel}" data-seedamount="${c.seedAmount}"
+      data-cap="${c.cap}">
+    <div class="top">
+      <span class="name">${esc(c.name)}</span>
+      <span class="badge ${esc(c.rarity)}">${esc(c.rarity)}</span>
+    </div>
+    <div class="row">
+      <div class="lvl">
+        <button class="step" data-act="dec" ${c.level<=0?'disabled':''} aria-label="Decrease level">&minus;</button>
+        <div class="lvlnum"><b>${c.level}</b><small>Level</small></div>
+        <button class="step" data-act="inc" ${c.level>=c.cap?'disabled':''} aria-label="Increase level">+</button>
+      </div>
+      <div class="amt">
+        <label for="a-${esc(c.id)}">Cards</label>
+        <input id="a-${esc(c.id)}" type="number" inputmode="numeric" min="0" step="1"
+          value="${c.amount}" data-act="amt" aria-label="Card count for ${esc(c.name)}">
+      </div>
+    </div>
+    ${body}
+  </div>`;
+}
+
+function render(){
+  renderChips();
+  const groups = groupsFor(tab);
+  const active = group === "All" ? groups : [group];
+  const q = query.trim().toLowerCase();
+  let html = "";
+  let total = 0;
+
+  for(const g of active){
+    const cards = seedList(tab, g)
+      .map(seed => {
+        const e = effective(tab, g, seed);
+        e.seedLevel = seed.level; e.seedAmount = seed.amount;
+        return e;
+      })
+      .filter(c => !q || c.name.toLowerCase().includes(q));
+    if(!cards.length) continue;
+    total += cards.length;
+    html += `<section class="group"><h2>${esc(g)}<span class="count">${cards.length}</span></h2>
+      <div class="cards">${cards.map(cardHTML).join("")}</div></section>`;
+  }
+
+  app.innerHTML = html + toolbarHTML();
+  if(total === 0){
+    app.innerHTML = `<div class="empty">No cards match “${esc(query)}”.</div>` + toolbarHTML();
+  }
+}
+
+function toolbarHTML(){
+  return `<div class="toolbar">
+    <button data-tool="export" type="button">⬇︎ Export</button>
+    <button data-tool="import" type="button">⬆︎ Import</button>
+    <button data-tool="reset" class="danger" type="button">↺ Reset</button>
+  </div>`;
+}
+
+/* ---------- Interactions ---------- */
+app.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-act], [data-tool]");
+  if(!btn) return;
+  const tool = btn.dataset.tool;
+  if(tool){ handleTool(tool); return; }
+
+  const card = btn.closest(".card");
+  if(!card) return;
+  const act = btn.dataset.act;
+  if(act === "inc" || act === "dec"){
+    const cap = +card.dataset.cap;
+    let level = clamp(+card.dataset.level + (act==="inc"?1:-1), 0, cap);
+    setOverride(card.dataset.id, +card.dataset.seedlevel, +card.dataset.seedamount, {level});
+    updateCard(card);
+  }
+});
+
+// Card count edits (debounced persistence on change/blur).
+app.addEventListener("input", (e) => {
+  const input = e.target.closest('input[data-act="amt"]');
+  if(!input) return;
+  const card = input.closest(".card");
+  let amount = Math.max(0, Math.floor(+input.value || 0));
+  setOverride(card.dataset.id, +card.dataset.seedlevel, +card.dataset.seedamount, {amount});
+  card.dataset.amount = amount;
+  updateBar(card);          // live bar update without stealing focus
+});
+app.addEventListener("change", (e) => {
+  const input = e.target.closest('input[data-act="amt"]');
+  if(!input) return;
+  input.value = Math.max(0, Math.floor(+input.value || 0));  // normalize display
+});
+
+// Re-render one card's steppers + bar after a level change.
+function updateCard(card){
+  const id = card.dataset.id;
+  const seed = { name:"", rarity:"", level:+card.dataset.seedlevel, amount:+card.dataset.seedamount };
+  // recompute from overrides
+  const o = overrides[id] || {};
+  const cap = +card.dataset.cap;
+  const level = clamp(Number.isFinite(o.level)?o.level:seed.level, 0, cap);
+  const amount = Number.isFinite(o.amount)?o.amount:seed.amount;
+  card.dataset.level = level; card.dataset.amount = amount;
+  card.querySelector(".lvlnum b").textContent = level;
+  card.querySelector('[data-act="dec"]').disabled = level<=0;
+  card.querySelector('[data-act="inc"]').disabled = level>=cap;
+  card.classList.toggle("dim", level===0 && amount===0);
+  updateBar(card);
+}
+
+function updateBar(card){
+  const level = +card.dataset.level, amount = +card.dataset.amount, cap = +card.dataset.cap;
+  const c = { level, amount, cap };
+  const prog = pct(c);
+  // Rebuild the progress area: remove existing progress nodes, keep .row.
+  card.querySelectorAll(":scope > .barwrap, :scope > .maxrow").forEach(n=>n.remove());
+  let node;
+  if(prog === null){
+    node = document.createElement("div");
+    node.className = "maxrow";
+    node.innerHTML = `★ MAX <span style="color:var(--muted);font-weight:600;margin-left:auto">Lv ${cap}</span>`;
+  }else{
+    const w = Math.round(prog.p*100);
+    const label = prog.cost
+      ? `${fmt(Math.min(amount,prog.cost))} / ${fmt(prog.cost)}`
+      : `Lv 0 &middot; ${fmt(amount)} cards`;
+    node = document.createElement("div");
+    node.className = "barwrap";
+    node.innerHTML = `<div class="bar"><i style="width:${w}%"></i></div>
+      <div class="barlabel"><span>To Lv ${level+1}</span><span>${label}</span></div>`;
+  }
+  card.appendChild(node);
+}
+
+/* ---------- Tools: export / import / reset ---------- */
+function handleTool(tool){
+  if(tool === "export") exportData();
+  else if(tool === "import") document.getElementById("importFile").click();
+  else if(tool === "reset") resetData();
+}
+
+function exportData(){
+  const payload = { schema:SCHEMA, overrides, savedAt:new Date().toISOString(),
+    app:"F1 Clash Resource Sheet", version:"v1" };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const stamp = new Date().toISOString().slice(0,10);
+  a.href = url; a.download = `f1clash-backup-${stamp}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  toast("Backup exported");
+}
+
+document.getElementById("importFile").addEventListener("change", function(){
+  const file = this.files && this.files[0];
+  this.value = "";
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const data = JSON.parse(reader.result);
+      if(!data || typeof data !== "object" || !data.overrides || typeof data.overrides !== "object"){
+        throw new Error("bad");
+      }
+      if(data.schema !== SCHEMA){
+        if(!confirm(`Backup schema (${data.schema}) differs from this app (${SCHEMA}). Import anyway?`)) return;
+      }
+      overrides = data.overrides;
+      save();
+      render();
+      toast("Backup imported");
+    }catch(e){
+      toast("Import failed — invalid file");
+    }
+  };
+  reader.readAsText(file);
+});
+
+function resetData(){
+  if(!confirm("Reset all levels and card counts back to the built-in defaults? This can't be undone.")) return;
+  overrides = {};
+  save();
+  render();
+  toast("Reset to defaults");
+}
+
+/* ---------- Header controls ---------- */
+document.querySelectorAll(".tabs button").forEach(b => {
+  b.addEventListener("click", () => {
+    if(tab === b.dataset.tab) return;
+    tab = b.dataset.tab; group = "All";
+    document.querySelectorAll(".tabs button").forEach(x =>
+      x.setAttribute("aria-selected", x===b ? "true" : "false"));
+    render();
+    window.scrollTo({top:0});
+  });
+});
+
+chipsEl.addEventListener("click", (e) => {
+  const chip = e.target.closest(".chip");
+  if(!chip) return;
+  group = chip.dataset.group;
+  render();
+});
+
+const searchEl = document.getElementById("search");
+const clearEl = document.getElementById("clear");
+searchEl.addEventListener("input", () => {
+  query = searchEl.value;
+  clearEl.hidden = !query;
+  render();
+});
+clearEl.addEventListener("click", () => {
+  searchEl.value = ""; query = ""; clearEl.hidden = true; render(); searchEl.focus();
+});
+
+/* ---------- Install prompt ---------- */
+let deferredPrompt = null;
+const installBtn = document.getElementById("install");
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.classList.add("show");
+});
+installBtn.addEventListener("click", async () => {
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  installBtn.classList.remove("show");
+});
+window.addEventListener("appinstalled", () => {
+  installBtn.classList.remove("show");
+  deferredPrompt = null;
+  toast("Installed");
+});
+
+/* ---------- Toast ---------- */
+let toastTimer = null;
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove("show"), 1800);
+}
+
+/* ---------- Utils ---------- */
+function esc(s){ return String(s).replace(/[&<>"']/g, c =>
+  ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function fmt(n){ return Number(n).toLocaleString("en-US"); }
+
+/* ---------- Boot ---------- */
+load();
+render();
+
+// Register the service worker with a relative path (works under /<repo>/).
+if("serviceWorker" in navigator){
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(()=>{ /* offline-first still works after first cache */ });
+  });
+}
+</script>
+</body>
+</html>
