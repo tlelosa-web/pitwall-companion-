@@ -30,6 +30,12 @@ living tracker you can update on the go.
   reach max**.
 - **Collection "to max" summary** at the top of each tab: total cards left,
   total coins left, and how many cards are already maxed.
+- **Asset Trading surplus** — once a card is maxed, the cards you keep piling up
+  become tradeable surplus. Each maxed card shows a **♻ *N* to trade** chip and,
+  in its Stats & costs panel, the surplus count and how many Asset Trades it's
+  worth (Common ×1000, Rare ×100, Epic ×10, Legendary ×3 surplus per trade). The
+  collection summary totals the surplus and trades available across the tab, and
+  it all recomputes live as you edit card counts.
 - **Search** by name and **filter chips** (All + each group of the active tab).
 - **Export** / **Import** a JSON backup, and **Reset** to the built-in defaults.
 - **Dark mode by default**, honoring `prefers-color-scheme`.
