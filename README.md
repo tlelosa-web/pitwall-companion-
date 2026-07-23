@@ -40,6 +40,12 @@ living tracker you can update on the go.
   unlock Series and sort by Series, Level, Total, Team Score or Name.
 - **Collection "to max" summary** at the top of each tab: total cards left,
   total coins left, and how many cards are already maxed.
+- **Asset Trading surplus** — once a card is maxed, the cards you keep piling up
+  become tradeable surplus. Each maxed card shows a **♻ *N* to trade** chip and,
+  in its Stats & costs panel, the surplus count and how many Asset Trades it's
+  worth (Common ×1000, Rare ×100, Epic ×10, Legendary ×3 surplus per trade). The
+  collection summary totals the surplus and trades available across the tab, and
+  it all recomputes live as you edit card counts.
 - **Search** by name and **filter chips** (All + each group of the active tab).
 - **Export** / **Import** a JSON backup, and **Reset** to the built-in defaults.
 - **Dark mode by default**, honoring `prefers-color-scheme`.
@@ -109,10 +115,14 @@ scoring. Type in the search box to filter tables and rows.
 
 Per-level **stats**, **Total / Team Score**, **coin/card upgrade costs** and the
 **unlock Series** are baked into the app from the *F1 Clash 2026 Resource Sheet
-v1.1* reference tables. This now covers **all 88 driver cards** and **all 46
-components** — every card the source sheet publishes. (An earlier build only
+v1.1* (`DriverStats` and `ComponentStats` sheets). This covers **all 88 driver
+cards** (Common, Rare, Epic and Legendary) and **all 46 components** across the
+seven categories — every card the source sheet publishes. (An earlier build only
 carried 13 drivers and 11 components; the full per-level dataset is embedded as
 of this release.)
+
+Cards still at **level 0** (not yet unlocked) show a "unlock to see stats"
+hint — that's expected; the numbers appear as soon as the card reaches level 1.
 
 > **Cards-to-max**, **coins-to-max**, **stats**, **Series** and the
 > **if-upgraded** preview are available for every card.
@@ -122,8 +132,8 @@ of this release.)
 ```js
 // cards needed to reach the NEXT level, keyed by current level
 const COST = {1:4,2:10,3:20,4:50,5:100,6:200,7:400,8:1000,9:2000,10:4000,11:8000};
-// max level per rarity
-const CAP  = {Common:11, Rare:9, Epic:7, Legendary:5};
+// max level per rarity (from the workbook stat sheets)
+const CAP  = {Common:11, Rare:9, Epic:8, Legendary:7};
 // per-card "boosted" slot scales stats by +10%
 const BOOST_PCT = 0.10;
 ```

@@ -157,6 +157,10 @@
   .barwrap{display:flex; flex-direction:column; gap:5px}
   .barlabel{display:flex; justify-content:space-between; font-size:11px; color:var(--muted)}
   .maxrow{display:flex; align-items:center; gap:6px; color:var(--gold); font-weight:800; font-size:13px}
+  .maxrow .trade{
+    color:var(--gold); font-weight:800; font-size:11px; letter-spacing:.02em;
+    background:var(--surface-2); border:1px solid var(--line); border-radius:999px; padding:2px 8px;
+  }
   .muted{color:var(--muted)} .small{font-size:12px} .gold{color:var(--gold)}
 
   /* collapsible stats & costs panel */
@@ -187,6 +191,9 @@
     border:1px solid var(--line); border-radius:10px; padding:8px 4px}
   .sum b{font-size:17px; font-weight:800}
   .sum small{font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em}
+  .sum-trade{margin-top:10px; padding-top:8px; border-top:1px dashed var(--line);
+    font-size:12px; color:var(--muted); text-align:center}
+  .sum-trade b{color:var(--gold); font-weight:800}
 
   .toolbar{
     display:flex; gap:8px; flex-wrap:wrap; margin:16px 2px 4px;
@@ -422,8 +429,11 @@
 /* ---------- Rules / constants ---------- */
 // card cost to reach the NEXT level, keyed by current level
 const COST = {1:4,2:10,3:20,4:50,5:100,6:200,7:400,8:1000,9:2000,10:4000,11:8000};
-// max level per rarity (Rare caps at 9; adjust if the game changes)
-const CAP  = {Common:11, Rare:9, Epic:7, Legendary:5};
+// max level per rarity, from the workbook stat sheets (Common 11, Rare 9,
+// Epic 8, Legendary 7); adjust if the game changes.
+const CAP  = {Common:11, Rare:9, Epic:8, Legendary:7};
+// surplus (extra maxed cards) needed for one Asset Trade, by rarity
+const TRADE = {Common:1000, Rare:100, Epic:10, Legendary:3};
 
 const STORAGE_KEY = "f1sheet.v1";
 const SCHEMA = 1;
@@ -898,6 +908,22 @@ function coinsToMax(id, level, cap){
   for(let k = level; k < cap && k < r.cu.length; k++) sum += (r.cu[k] || 0);
   return sum;
 }
+// Tradeable surplus for a MAXED card: all cards on hand are surplus once a card
+// is at its rarity cap, and every `unit` of them is worth one Asset Trade.
+function tradesFor(c){
+  if(c.level < c.cap) return null;              // only maxed cards have surplus
+  const unit = TRADE[c.rarity] || 0;
+  const surplus = Math.max(0, c.amount);
+  return { surplus, unit, trades: unit ? Math.floor(surplus / unit) : 0 };
+}
+function surplusText(tr){
+  if(!tr) return "";
+  const t = tr.trades;
+  return `${fmt(tr.surplus)} cards`
+    + (tr.unit ? ` &middot; <span class="gold">${fmt(t)} trade${t===1?"":"s"}</span>`
+                 + ` <span class="muted small">(&times;${fmt(tr.unit)})</span>` : "");
+}
+
 // Stats/Total/Team at a given level (null if none).
 function statsAt(id, level){
   const r = REF[id]; if(!r || level < 1 || level > r.s.length) return null;
@@ -948,7 +974,10 @@ function upgradePreview(c){
 function progressHTML(c){
   const prog = pct(c);
   if(prog === null){
-    return `<div class="maxrow">★ MAX <span class="muted" style="margin-left:auto">Lv ${c.cap}</span></div>`;
+    const tr = tradesFor(c);
+    const chip = tr && tr.trades > 0
+      ? `<span class="trade">♻ ${fmt(tr.trades)} to trade</span>` : "";
+    return `<div class="maxrow">★ MAX ${chip}<span class="muted" style="margin-left:auto">Lv ${c.cap}</span></div>`;
   }
   const w = Math.round(prog.p * 100);
   const coin = coinToNext(c.id, c.level);
@@ -1016,7 +1045,8 @@ function detailsHTML(c){
     </label>` : "";
 
   const planRows = `<div class="plan">
-    ${atMax ? `<div class="planrow"><span>Status</span><b class="gold">★ Maxed</b></div>`
+    ${atMax ? `<div class="planrow"><span>Status</span><b class="gold">★ Maxed</b></div>
+               <div class="planrow"><span>Surplus to trade</span><b class="surplus-val">${surplusText(tradesFor(c))}</b></div>`
             : `<div class="planrow"><span>To max (Lv ${c.cap})</span><b>${fmt(toMaxCards)} cards${toMaxCoins!=null?` &middot; ${fmtCoins(toMaxCoins)} coins`:""}</b></div>`}
   </div>`;
 
@@ -1158,23 +1188,32 @@ function render(){
 
 // Collection-wide "to max" totals for the ACTIVE tab (ignores search/filter).
 function tabTotals(){
-  let cards = 0, coins = 0, maxed = 0, count = 0;
+  let cards = 0, coins = 0, maxed = 0, count = 0, surplus = 0, trades = 0;
   for(const g of groupsFor(tab)){
     for(const seed of seedList(tab, g)){
       const c = effective(tab, g, seed);
       count++;
-      if(c.level >= c.cap){ maxed++; continue; }
+      if(c.level >= c.cap){
+        maxed++;
+        const unit = TRADE[c.rarity] || 0;
+        surplus += c.amount;
+        if(unit) trades += Math.floor(c.amount / unit);
+        continue;
+      }
       cards += cardsToMax(c.level, c.cap, c.amount);
       const cn = coinsToMax(c.id, c.level, c.cap);
       if(cn != null) coins += cn;
     }
   }
-  return { cards, coins, maxed, count };
+  return { cards, coins, maxed, count, surplus, trades };
 }
 
 function summaryHTML(){
   const t = tabTotals();
   const label = tab === "drivers" ? "Drivers" : "Components";
+  const tradeLine = (t.surplus > 0)
+    ? `<div class="sum-trade">♻ ${fmt(t.surplus)} surplus cards &middot;
+         <b>${fmt(t.trades)}</b> asset trade${t.trades===1?"":"s"} available</div>` : "";
   return `<div class="summary" id="summary">
     <div class="sum-title">${label} · to max everything</div>
     <div class="sum-grid">
@@ -1182,6 +1221,7 @@ function summaryHTML(){
       <div class="sum"><b>${fmtCoins(t.coins)}</b><small>coins left</small></div>
       <div class="sum"><b>${t.maxed}/${t.count}</b><small>maxed</small></div>
     </div>
+    ${tradeLine}
   </div>`;
 }
 
@@ -1786,11 +1826,30 @@ function refreshAmount(card){
     const lbl = bw.querySelector(".barlabel span:last-child");
     if(lbl) lbl.innerHTML = cardPart + coinPart;
   }
-  const planB = card.querySelector(".plan .planrow b");
-  if(planB && c.level < c.cap){
-    const toMaxCoins = coinsToMax(c.id, c.level, c.cap);
-    planB.innerHTML = `${fmt(cardsToMax(c.level, c.cap, c.amount))} cards`
-      + (toMaxCoins!=null ? ` &middot; ${fmtCoins(toMaxCoins)} coins` : "");
+  if(c.level < c.cap){
+    const planB = card.querySelector(".plan .planrow b");
+    if(planB){
+      const toMaxCoins = coinsToMax(c.id, c.level, c.cap);
+      planB.innerHTML = `${fmt(cardsToMax(c.level, c.cap, c.amount))} cards`
+        + (toMaxCoins!=null ? ` &middot; ${fmtCoins(toMaxCoins)} coins` : "");
+    }
+  }else{
+    // maxed card: patch the surplus/trades figures live
+    const tr = tradesFor(c);
+    const sv = card.querySelector(".surplus-val");
+    if(sv) sv.innerHTML = surplusText(tr);
+    const maxrow = card.querySelector(".maxrow");
+    if(maxrow){
+      let chip = maxrow.querySelector(".trade");
+      if(tr && tr.trades > 0){
+        if(!chip){
+          chip = document.createElement("span");
+          chip.className = "trade";
+          maxrow.insertBefore(chip, maxrow.querySelector(".muted"));
+        }
+        chip.innerHTML = `♻ ${fmt(tr.trades)} to trade`;
+      }else if(chip){ chip.remove(); }
+    }
   }
   card.classList.toggle("dim", c.level===0 && c.amount===0);
   updateSummary();
