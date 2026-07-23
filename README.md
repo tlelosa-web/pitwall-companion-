@@ -91,8 +91,8 @@ hint — that's expected; the numbers appear as soon as the card reaches level 1
 ```js
 // cards needed to reach the NEXT level, keyed by current level
 const COST = {1:4,2:10,3:20,4:50,5:100,6:200,7:400,8:1000,9:2000,10:4000,11:8000};
-// max level per rarity
-const CAP  = {Common:11, Rare:9, Epic:8, Legendary:5};
+// max level per rarity (from the workbook stat sheets)
+const CAP  = {Common:11, Rare:9, Epic:8, Legendary:7};
 ```
 
 Progress toward the next level is `min(amount / COST[level], 1)`; at
