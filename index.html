@@ -208,6 +208,84 @@
     opacity:0; pointer-events:none; transition:.22s; z-index:50; max-width:90vw; text-align:center;
   }
   .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+
+  /* ---------- Season dashboard ---------- */
+  .season{display:flex; flex-direction:column; gap:12px; margin-top:12px}
+  .panel{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:12px;
+  }
+  .panel > h3{
+    margin:0 0 10px; font-size:12px; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--muted); font-weight:800;
+  }
+  .panel > h3 .hint{float:right; text-transform:none; letter-spacing:0; font-weight:600; color:var(--muted)}
+
+  /* countdown */
+  .countdown{display:flex; align-items:center; gap:12px; flex-wrap:wrap}
+  .cd-big{display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:var(--surface-2); border:1px solid var(--line); border-radius:12px;
+    padding:10px 16px; min-width:96px}
+  .cd-big b{font-size:30px; font-weight:900; line-height:1; color:var(--gold)}
+  .cd-big small{font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-top:4px}
+  .cd-dates{flex:1 1 180px; display:flex; flex-direction:column; gap:8px}
+  .cd-date{display:flex; align-items:center; gap:8px; justify-content:space-between}
+  .cd-date label{font-size:12px; color:var(--muted); flex:0 0 auto}
+  .cd-date input{
+    background:var(--surface-2); color:var(--text); border:1px solid var(--line);
+    border-radius:10px; padding:8px 10px; min-height:var(--tap); flex:1 1 auto; max-width:170px;
+    color-scheme:dark;
+  }
+  @media (prefers-color-scheme: light){ .cd-date input{color-scheme:light} }
+  .cd-season-bar{margin-top:4px}
+
+  /* editable metric rows */
+  .metric{display:flex; flex-direction:column; gap:6px; padding:10px 0; border-top:1px solid var(--line)}
+  .metric:first-of-type{border-top:0}
+  .metric .mtop{display:flex; align-items:center; gap:8px}
+  .metric .mname{font-weight:700; font-size:14px; flex:1 1 auto}
+  .metric .mpct{font-weight:800; font-size:13px; color:var(--accent); flex:0 0 auto; min-width:44px; text-align:right}
+  .metric .minputs{display:flex; align-items:center; gap:6px; flex:0 0 auto}
+  .metric .minputs input, .metric .minputs select{
+    background:var(--surface-2); color:var(--text); border:1px solid var(--line);
+    border-radius:10px; padding:8px 8px; min-height:38px; text-align:right;
+  }
+  .metric .minputs input{width:66px}
+  .metric .minputs select{text-align:left; max-width:150px}
+  .metric .minputs input:focus, .metric .minputs select:focus, .cd-date input:focus{
+    outline:2px solid var(--accent); outline-offset:1px}
+  .metric .msep{color:var(--muted); font-size:12px}
+
+  /* CC score summary */
+  .cc-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+  .cc{display:flex; flex-direction:column; align-items:center; gap:2px; background:var(--surface-2);
+    border:1px solid var(--line); border-radius:10px; padding:10px 6px}
+  .cc b{font-size:20px; font-weight:900}
+  .cc.hi b{color:var(--gold)}
+  .cc small{font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; text-align:center}
+
+  /* ---------- Reward reference tables ---------- */
+  .rewards{display:flex; flex-direction:column; gap:14px; margin-top:12px}
+  .rtable{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden}
+  .rtable > .rt-head{padding:11px 12px; border-bottom:1px solid var(--line)}
+  .rtable > .rt-head h3{margin:0; font-size:14px; font-weight:800}
+  .rtable > .rt-head p{margin:3px 0 0; font-size:11px; color:var(--muted); line-height:1.4}
+  .rt-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch}
+  table.rt{width:100%; border-collapse:collapse; font-size:13px; min-width:min-content}
+  table.rt th, table.rt td{padding:8px 12px; text-align:left; white-space:nowrap}
+  table.rt thead th{
+    position:sticky; top:0; background:var(--surface-2); color:var(--muted);
+    font-size:11px; text-transform:uppercase; letter-spacing:.05em; font-weight:800;
+    border-bottom:1px solid var(--line);
+  }
+  table.rt td.num, table.rt th.num{text-align:right; font-variant-numeric:tabular-nums}
+  table.rt tbody tr:nth-child(even){background:var(--surface-2)}
+  table.rt tbody tr.grp td{
+    background:var(--surface); font-weight:800; color:var(--text);
+    border-top:1px solid var(--line); font-size:11px; text-transform:uppercase; letter-spacing:.05em;
+  }
+  table.rt tbody td.pct{color:var(--ok); font-weight:700}
+  .rt-note{color:var(--muted); font-size:11px; line-height:1.5; padding:2px 4px}
+  .rt-empty{padding:16px 12px; color:var(--muted); font-size:13px; text-align:center}
 </style>
 </head>
 <body>
@@ -230,7 +308,9 @@
 
   <div class="tabs" role="tablist" aria-label="Category">
     <button role="tab" id="tab-drivers" aria-selected="true" data-tab="drivers">Drivers</button>
-    <button role="tab" id="tab-components" aria-selected="false" data-tab="components">Components</button>
+    <button role="tab" id="tab-components" aria-selected="false" data-tab="components">Parts</button>
+    <button role="tab" id="tab-season" aria-selected="false" data-tab="season">Season</button>
+    <button role="tab" id="tab-rewards" aria-selected="false" data-tab="rewards">Rewards</button>
   </div>
 </header>
 
@@ -257,6 +337,77 @@ const CAP  = {Common:11, Rare:9, Epic:7, Legendary:5};
 
 const STORAGE_KEY = "f1sheet.v1";
 const SCHEMA = 1;
+
+// Season dashboard has its own namespaced, schema-guarded key.
+const SEASON_KEY = "f1sheet.season.v1";
+const SEASON_SCHEMA = 1;
+
+/* ---------- Reward & payout reference tables (from workbook "CCData",
+   identical in v1.0 and v1.1) ---------- */
+const REWARDS = {
+  // Per-race medal payout: share of the race's medal pot by tier + finishing slot.
+  medal: {
+    cols: ["1st","2nd","3rd","Top 10","Finish","Qualify"],
+    rows: [
+      {tier:"Champion",   v:[.50,.45,.40,.35,.30,.20]},
+      {tier:"Contender",  v:[.375,.34,.30,.26,.225,.15]},
+      {tier:"Challenger", v:[.25,.23,.20,.18,.15,.10]},
+      {tier:"Junior",     v:[.10,.09,.08,.07,.06,.04]}
+    ]
+  },
+  // GP "best medal" quality scale used for CC scoring (best -> worst).
+  gpBest: [
+    ["Champion 1st",1.0],["Contender 1st",.70],["Champion 2nd",.60],["Champion 3rd",.50],
+    ["Contender 2nd",.45],["Challenger 1st",.40],["Champion 10",.40],["Contender 3rd",.375],
+    ["Champion F",.30],["Challenger 2nd",.30],["Contender 10",.30],["Challenger 3rd",.25],
+    ["Contender F",.225],["Champion Q",.20],["Challenger 10",.20],["Junior 1st",.165],
+    ["Contender Q",.15],["Challenger F",.15],["Junior 2nd",.14],["Junior 3rd",.115],
+    ["Challenger Q",.10],["Junior 10",.09],["Junior F",.065],["Junior Q",.04],["None",0.0]
+  ],
+  // Weekly League standing -> season completion weight.
+  league: [
+    ["Legend",1.0],["Super Champ",.9167],["Champ",.8333],["Contender 3",.75],
+    ["Contender 2",.6667],["Contender 1",.5833],["Challenger 3",.50],["Challenger 2",.4167],
+    ["Challenger 1",.3333],["Junior 3",.25],["Junior 2",.1667],["Junior 1",.0833],["Rookie",0.0]
+  ],
+  // Milestone -> weight for total Races and Wins.
+  races: [[2200,1.0],[1000,.80],[500,.60],[100,.40],[10,.20],[0,0.0]],
+  wins:  [[1750,1.0],[800,.80],[400,.60],[80,.40],[5,.20],[0,0.0]],
+  // Highest Series reached -> weight (Series 1..12).
+  series: [[12,1.0],[11,.917],[10,.833],[9,.75],[8,.667],[7,.583],
+           [6,.50],[5,.417],[4,.333],[3,.25],[2,.167],[1,.083]],
+  // Coin bank milestone -> CC score contribution.
+  coins: [["10B",150],["1B",120],["100M",90],["10M",70],["1M",50],["100K",30],["10K",20],["0K",10]]
+};
+
+// Small lookup helper over a [key,value] pair list.
+function lookup(pairs, key){
+  for(const [k,v] of pairs) if(k === key) return v;
+  return null;
+}
+
+/* ---------- Season dashboard model ----------
+   Seeded from the v1.0 "CC  Asset Tracker" snapshot. Counts carry an editable
+   current + target; the milestone metrics pick a value whose weight is looked
+   up from REWARDS (matching the workbook's VLOOKUP scoring). CC Rank / Points /
+   Total CC are derived live exactly as the workbook computes them. */
+const SEASON_DEFAULT = {
+  seasonStart: "2026-04-20",
+  seasonEnd:   "2027-04-19",
+  // editable counts: [current, target]
+  drivers:    [38, 66],
+  driverUpg:  [185, 616],
+  parts:      [36, 53],
+  partUpg:    [211, 442],
+  // milestone metrics
+  weekly:     "Legend",
+  gpTotal:    2,
+  gpBest:     "Junior 2nd",
+  series:     6,
+  racesDone:  500,
+  racesWon:   400,
+  coins:      "100K"
+};
 
 const DRIVER_GROUPS = ["Common","Rare","Epic","Legendary"];
 const COMPONENT_GROUPS = ["Front Wing","Brakes","Suspension","Rear Wing","Gearbox","Engine","Battery"];
@@ -435,9 +586,10 @@ const REF = {"d:Common:Bottas":{"r":"Common","g":"Common","k":"d","n":["overtaki
 
 /* ---------- State ---------- */
 let overrides = {};        // { id: {level, amount} }
-let tab = "drivers";       // "drivers" | "components"
+let tab = "drivers";       // "drivers" | "components" | "season" | "rewards"
 let group = "All";         // active filter chip
 let query = "";            // search text
+let season = {};           // season dashboard state (see SEASON_DEFAULT)
 
 function load(){
   try{
@@ -456,6 +608,79 @@ function save(){
       schema:SCHEMA, overrides, savedAt:new Date().toISOString()
     }));
   }catch(e){ toast("Couldn't save — storage full?"); }
+}
+
+/* ---------- Season state ---------- */
+function loadSeason(){
+  season = Object.assign({}, SEASON_DEFAULT);
+  try{
+    const raw = localStorage.getItem(SEASON_KEY);
+    if(!raw) return;
+    const data = JSON.parse(raw);
+    if(data && typeof data === "object" && data.schema === SEASON_SCHEMA && data.state){
+      // merge stored values over the seed so new fields stay defined
+      season = Object.assign({}, SEASON_DEFAULT, data.state);
+    }
+  }catch(e){ /* corrupt storage -> keep seed */ }
+}
+function saveSeason(){
+  try{
+    localStorage.setItem(SEASON_KEY, JSON.stringify({
+      schema:SEASON_SCHEMA, state:season, savedAt:new Date().toISOString()
+    }));
+  }catch(e){ toast("Couldn't save — storage full?"); }
+}
+
+/* ---------- Season computation (mirrors the workbook's CC scoring) ---------- */
+function ratio(cur, tgt){ if(!(tgt > 0)) return 0; return clamp(cur / tgt, 0, 1); }
+
+// The 10 base metrics, each with a live 0..1 weight, in workbook order.
+function baseMetrics(){
+  return [
+    {key:"drivers",   name:"Drivers",         kind:"count", cur:season.drivers[0],   tgt:season.drivers[1]},
+    {key:"driverUpg", name:"Driver Upgrades", kind:"count", cur:season.driverUpg[0], tgt:season.driverUpg[1]},
+    {key:"parts",     name:"Parts",           kind:"count", cur:season.parts[0],     tgt:season.parts[1]},
+    {key:"partUpg",   name:"Part Upgrades",   kind:"count", cur:season.partUpg[0],   tgt:season.partUpg[1]},
+    {key:"weekly",    name:"Weekly League",   kind:"pick",  opts:REWARDS.league.map(r=>r[0]),
+      val:season.weekly, p:lookup(REWARDS.league, season.weekly) ?? 0},
+    {key:"gpTotal",   name:"GP Medals Total", kind:"num",   val:season.gpTotal,
+      p:(Number(season.gpTotal) >= 1 ? 1 : 0)},
+    {key:"gpBest",    name:"GP Medal (Best)", kind:"pick",  opts:REWARDS.gpBest.map(r=>r[0]),
+      val:season.gpBest, p:lookup(REWARDS.gpBest, season.gpBest) ?? 0},
+    {key:"series",    name:"Highest Series",  kind:"pick",  opts:REWARDS.series.map(r=>r[0]),
+      val:season.series, p:lookup(REWARDS.series, Number(season.series)) ?? 0},
+    {key:"racesDone", name:"Races Done",      kind:"pick",  opts:REWARDS.races.map(r=>r[0]),
+      val:season.racesDone, p:lookup(REWARDS.races, Number(season.racesDone)) ?? 0},
+    {key:"racesWon",  name:"Races Won",       kind:"pick",  opts:REWARDS.wins.map(r=>r[0]),
+      val:season.racesWon, p:lookup(REWARDS.wins, Number(season.racesWon)) ?? 0}
+  ];
+}
+function metricPct(m){ return m.kind === "count" ? ratio(m.cur, m.tgt) : m.p; }
+
+// Derived CC score, computed exactly like the workbook.
+function ccScore(){
+  const ms = baseMetrics();
+  const base = ms.reduce((s,m)=> s + metricPct(m), 0) / ms.length;
+  const rank = Math.floor(base * 100 / 5);          // 0..20
+  const points = rank * 25;                          // 0..500
+  const coinCC = lookup(REWARDS.coins, season.coins) ?? 0;
+  const total = points + coinCC;                     // 0..650
+  return { base, rank, points, coinCC, total };
+}
+
+// Days / progress for the season countdown (today is live).
+function seasonTiming(){
+  const day = 86400000;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const start = new Date(season.seasonStart + "T00:00:00");
+  const end   = new Date(season.seasonEnd + "T00:00:00");
+  const validS = !isNaN(start), validE = !isNaN(end);
+  const daysLeft = validE ? Math.max(0, Math.ceil((end - today)/day)) : null;
+  let elapsed = 0;
+  if(validS && validE && end > start){
+    elapsed = clamp((today - start)/(end - start), 0, 1);
+  }
+  return { daysLeft, elapsed, valid: validS && validE };
 }
 
 /* ---------- Model helpers ---------- */
@@ -629,7 +854,22 @@ function cardFromEl(card){
   };
 }
 
+// Show/hide the search box and filter chips depending on the active tab.
+function updateChrome(){
+  const searchEl = document.querySelector(".search");
+  const isCollection = tab === "drivers" || tab === "components";
+  chipsEl.style.display = isCollection ? "" : "none";
+  // Search filters collection cards and reward-table rows, but not the Season tab.
+  searchEl.style.display = (tab === "season") ? "none" : "";
+  const searchInput = document.getElementById("search");
+  if(tab === "rewards") searchInput.placeholder = "Search reward tables…";
+  else searchInput.placeholder = "Search by name…";
+}
+
 function render(){
+  updateChrome();
+  if(tab === "season"){ renderSeason(); return; }
+  if(tab === "rewards"){ renderRewards(); return; }
   renderChips();
   const groups = groupsFor(tab);
   const active = group === "All" ? groups : [group];
@@ -691,6 +931,209 @@ function updateSummary(){
   if(el) el.outerHTML = summaryHTML();
 }
 
+/* ---------- Season dashboard render ---------- */
+function metricRowHTML(m){
+  const p = Math.round(metricPct(m) * 100);
+  let inputs;
+  if(m.kind === "count"){
+    inputs = `<input type="number" inputmode="numeric" min="0" step="1" value="${m.cur}"
+        data-skey="${m.key}" data-part="0" aria-label="${esc(m.name)} current">
+      <span class="msep">/</span>
+      <input type="number" inputmode="numeric" min="0" step="1" value="${m.tgt}"
+        data-skey="${m.key}" data-part="1" aria-label="${esc(m.name)} target">`;
+  }else if(m.kind === "pick"){
+    const opts = m.opts.map(o =>
+      `<option value="${esc(o)}"${String(o)===String(m.val)?" selected":""}>${esc(o)}</option>`).join("");
+    inputs = `<select data-skey="${m.key}" aria-label="${esc(m.name)}">${opts}</select>`;
+  }else{ // num (free count, no target)
+    inputs = `<input type="number" inputmode="numeric" min="0" step="1" value="${m.val}"
+        data-skey="${m.key}" aria-label="${esc(m.name)}">`;
+  }
+  return `<div class="metric" data-mkey="${m.key}">
+    <div class="mtop">
+      <span class="mname">${esc(m.name)}</span>
+      <div class="minputs">${inputs}</div>
+      <span class="mpct">${p}%</span>
+    </div>
+    <div class="bar"><i style="width:${p}%"></i></div>
+  </div>`;
+}
+
+function renderSeason(){
+  const ms = baseMetrics();
+  const t = seasonTiming();
+  const cc = ccScore();
+  const daysTxt = t.daysLeft == null ? "—" : fmt(t.daysLeft);
+
+  const countdown = `<div class="panel">
+    <h3>Season Countdown</h3>
+    <div class="countdown">
+      <div class="cd-big"><b>${daysTxt}</b><small>days left</small></div>
+      <div class="cd-dates">
+        <div class="cd-date"><label for="s-start">Season start</label>
+          <input id="s-start" type="date" value="${esc(season.seasonStart)}" data-skey="seasonStart"></div>
+        <div class="cd-date"><label for="s-end">Season end</label>
+          <input id="s-end" type="date" value="${esc(season.seasonEnd)}" data-skey="seasonEnd"></div>
+      </div>
+    </div>
+    <div class="barwrap cd-season-bar">
+      <div class="bar"><i style="width:${Math.round(t.elapsed*100)}%"></i></div>
+      <div class="barlabel"><span>Season elapsed</span><span id="s-elapsed">${Math.round(t.elapsed*100)}%</span></div>
+    </div>
+  </div>`;
+
+  const progress = `<div class="panel">
+    <h3>Collection &amp; Race Progress <span class="hint">tap values to edit</span></h3>
+    ${ms.map(metricRowHTML).join("")}
+  </div>`;
+
+  const ccCard = `<div class="panel">
+    <h3>CC Score <span class="hint">auto-calculated</span></h3>
+    <div class="cc-grid">
+      <div class="cc"><b id="cc-base">${Math.round(cc.base*100)}%</b><small>Base Asset Progress</small></div>
+      <div class="cc"><b id="cc-rank">${cc.rank}<span class="muted small"> / 20</span></b><small>CC Rank</small></div>
+      <div class="cc"><b id="cc-points">${fmt(cc.points)}<span class="muted small"> / 500</span></b><small>CC Points</small></div>
+      <div class="cc hi"><b id="cc-total">${fmt(cc.total)}<span class="muted small"> / 650</span></b><small>Total CC</small></div>
+    </div>
+    <div class="rt-note" style="margin-top:8px">
+      Coins bank <b>${esc(season.coins)}</b> adds ${fmt(cc.coinCC)} CC.
+      <select data-skey="coins" aria-label="Coins bank" style="margin-left:6px; background:var(--surface-2); color:var(--text); border:1px solid var(--line); border-radius:8px; padding:6px 8px; min-height:34px">
+        ${REWARDS.coins.map(([k])=>`<option value="${esc(k)}"${k===season.coins?" selected":""}>${esc(k)} coins</option>`).join("")}
+      </select>
+    </div>
+  </div>`;
+
+  const help = `<div class="rt-note">
+    Seeded from your v1.0 workbook snapshot. Counts use current ÷ target; the milestone
+    metrics (league, medals, series, races) use the workbook's step scoring, so CC Rank,
+    CC Points and Total CC recompute exactly as the sheet does. All values stay on this device.
+  </div>`;
+
+  app.innerHTML = `<div class="season">${countdown}${progress}${ccCard}${help}</div>`;
+}
+
+// Live-patch the season derived figures without disturbing focused inputs.
+function refreshSeason(){
+  const ms = baseMetrics();
+  const t = seasonTiming();
+  const cc = ccScore();
+  ms.forEach(m => {
+    const row = document.querySelector(`.metric[data-mkey="${m.key}"]`);
+    if(!row) return;
+    const p = Math.round(metricPct(m) * 100);
+    const bar = row.querySelector(".bar > i"); if(bar) bar.style.width = p + "%";
+    const pct = row.querySelector(".mpct"); if(pct) pct.textContent = p + "%";
+  });
+  const setW = (id, w) => { const el = document.getElementById(id); if(el) el.style.width = w; };
+  const setT = (id, txt) => { const el = document.getElementById(id); if(el) el.innerHTML = txt; };
+  setT("cc-base", Math.round(cc.base*100) + "%");
+  setT("cc-rank", cc.rank + '<span class="muted small"> / 20</span>');
+  setT("cc-points", fmt(cc.points) + '<span class="muted small"> / 500</span>');
+  setT("cc-total", fmt(cc.total) + '<span class="muted small"> / 650</span>');
+  // countdown + elapsed
+  const big = document.querySelector(".cd-big b");
+  if(big) big.textContent = t.daysLeft == null ? "—" : fmt(t.daysLeft);
+  const eBar = document.querySelector(".cd-season-bar .bar > i");
+  if(eBar) eBar.style.width = Math.round(t.elapsed*100) + "%";
+  setT("s-elapsed", Math.round(t.elapsed*100) + "%");
+}
+
+/* ---------- Reward reference tables render ---------- */
+function pctCell(v){ return `<td class="num pct">${Math.round(v*100)}%</td>`; }
+
+function rewardTablesHTML(){
+  const R = REWARDS;
+  // 1) Per-race medal payout
+  const medalHead = `<tr><th>Tier</th>${R.medal.cols.map(c=>`<th class="num">${esc(c)}</th>`).join("")}</tr>`;
+  const medalBody = R.medal.rows.map(r =>
+    `<tr><td>${esc(r.tier)}</td>${r.v.map(pctCell).join("")}</tr>`).join("");
+  const medal = tableBlock("medal", "Race Medal Payout",
+    "Share of a race's medal pot by tier and finishing position.",
+    `<thead>${medalHead}</thead><tbody>${medalBody}</tbody>`);
+
+  // 2) Weekly League
+  const league = tableBlock("league", "Weekly League",
+    "Season completion weight by final Weekly League standing.",
+    `<thead><tr><th>Standing</th><th class="num">Weight</th></tr></thead><tbody>`
+    + R.league.map(([k,v])=>`<tr><td>${esc(k)}</td>${pctCell(v)}</tr>`).join("") + `</tbody>`);
+
+  // 3) Races & Wins
+  const rw = tableBlock("races", "Races &amp; Wins Milestones",
+    "Total races completed and races won, with their completion weight.",
+    `<thead><tr><th class="num">Races</th><th class="num">Weight</th><th class="num">Wins</th><th class="num">Weight</th></tr></thead><tbody>`
+    + R.races.map((row,i)=>{
+        const w = R.wins[i] || ["",""];
+        return `<tr><td class="num">${fmt(row[0])}</td>${pctCell(row[1])}<td class="num">${w[0]===""?"":fmt(w[0])}</td>${w[1]===""?"<td></td>":pctCell(w[1])}</tr>`;
+      }).join("") + `</tbody>`);
+
+  // 4) Series unlock weight
+  const series = tableBlock("series", "Series Progress",
+    "Highest Series reached and its season completion weight.",
+    `<thead><tr><th class="num">Series</th><th class="num">Weight</th></tr></thead><tbody>`
+    + R.series.map(([k,v])=>`<tr><td class="num">Series ${fmt(k)}</td>${pctCell(v)}</tr>`).join("") + `</tbody>`);
+
+  // 5) GP medal quality scale
+  const gp = tableBlock("gp", "GP Medal Quality",
+    "Best Grand Prix medal ranked into a scoring weight (best to worst).",
+    `<thead><tr><th>Best Medal</th><th class="num">Weight</th></tr></thead><tbody>`
+    + R.gpBest.map(([k,v])=>`<tr><td>${esc(k)}</td>${pctCell(v)}</tr>`).join("") + `</tbody>`);
+
+  // 6) Coins -> CC
+  const coins = tableBlock("coins", "Coins → CC",
+    "Coin bank milestone and the CC score it contributes.",
+    `<thead><tr><th class="num">Coins</th><th class="num">CC</th></tr></thead><tbody>`
+    + R.coins.map(([k,v])=>`<tr><td class="num">${esc(k)}</td><td class="num">${fmt(v)}</td></tr>`).join("") + `</tbody>`);
+
+  return [medal, league, rw, series, gp, coins];
+}
+
+function tableBlock(key, title, desc, inner){
+  return `<div class="rtable" data-rt="${key}" data-text="${esc((title+" "+desc).toLowerCase())}">
+    <div class="rt-head"><h3>${title}</h3><p>${esc(desc)}</p></div>
+    <div class="rt-scroll"><table class="rt">${inner}</table></div>
+  </div>`;
+}
+
+function renderRewards(){
+  const q = query.trim().toLowerCase();
+  const blocks = rewardTablesHTML();
+  const note = `<div class="rt-note">
+    Reference data from the community F1 Clash 2026 Resource Sheet (identical in v1.0 &amp; v1.1).
+    Read-only — nothing here is saved. Percentages are completion weights used for CC scoring.
+  </div>`;
+  app.innerHTML = `<div class="rewards" id="rewards">${blocks.join("")}${note}</div>`;
+  if(q) filterRewards(q);
+}
+
+// Filter reward blocks (and their rows) by the search text.
+function filterRewards(q){
+  const wrap = document.getElementById("rewards");
+  if(!wrap) return;
+  let anyVisible = false;
+  wrap.querySelectorAll(".rtable").forEach(tbl => {
+    const titleMatch = (tbl.dataset.text || "").includes(q);
+    let rowsShown = 0;
+    tbl.querySelectorAll("tbody tr").forEach(tr => {
+      const hit = titleMatch || tr.textContent.toLowerCase().includes(q);
+      tr.style.display = hit ? "" : "none";
+      if(hit) rowsShown++;
+    });
+    const show = titleMatch || rowsShown > 0;
+    tbl.style.display = show ? "" : "none";
+    if(show) anyVisible = true;
+  });
+  let empty = wrap.querySelector(".rt-empty");
+  if(!anyVisible){
+    if(!empty){
+      empty = document.createElement("div");
+      empty.className = "rt-empty";
+      wrap.prepend(empty);
+    }
+    empty.textContent = `No reward data matches “${query}”.`;
+    empty.style.display = "";
+  }else if(empty){ empty.style.display = "none"; }
+}
+
 function toolbarHTML(){
   return `<div class="toolbar">
     <button data-tool="export" type="button">⬇︎ Export</button>
@@ -731,6 +1174,38 @@ app.addEventListener("change", (e) => {
   const input = e.target.closest('input[data-act="amt"]');
   if(!input) return;
   input.value = Math.max(0, Math.floor(+input.value || 0));  // normalize display
+});
+
+/* ---------- Season inputs ---------- */
+function applySeasonField(el){
+  const key = el.dataset.skey;
+  if(!key) return;
+  if(key === "drivers" || key === "driverUpg" || key === "parts" || key === "partUpg"){
+    const arr = season[key].slice();
+    arr[+el.dataset.part] = Math.max(0, Math.floor(+el.value || 0));
+    season[key] = arr;
+  }else if(key === "gpTotal"){
+    season[key] = Math.max(0, Math.floor(+el.value || 0));
+  }else if(key === "series" || key === "racesDone" || key === "racesWon"){
+    season[key] = Number(el.value);
+  }else{ // weekly, gpBest, coins, seasonStart, seasonEnd
+    season[key] = el.value;
+  }
+  saveSeason();
+}
+app.addEventListener("input", (e) => {
+  const el = e.target.closest("[data-skey]");
+  if(!el) return;
+  applySeasonField(el);
+  refreshSeason();       // patch derived figures, keep input focus
+});
+app.addEventListener("change", (e) => {
+  const el = e.target.closest("[data-skey]");
+  if(!el) return;
+  applySeasonField(el);
+  // discrete controls: full re-render keeps derived labels (coin note) in sync
+  if(el.tagName === "SELECT" || el.type === "date") renderSeason();
+  else refreshSeason();
 });
 
 // After a LEVEL change: fully rebuild the card body (level changes stats,
@@ -906,6 +1381,7 @@ function fmtCoins(n){
 
 /* ---------- Boot ---------- */
 load();
+loadSeason();
 render();
 
 // Register the service worker with a relative path (works under /<repo>/).
