@@ -2,7 +2,7 @@
  * Precache everything needed to run offline, cache-first with an
  * index.html network fallback. Bump CACHE_VERSION whenever a cached
  * file changes so clients pick up the new assets. */
-const CACHE_VERSION = "f1sheet-v10";
+const CACHE_VERSION = "f1sheet-v11";
 
 // Relative URLs so the app works under /<repo>/ on GitHub Pages.
 const PRECACHE = [

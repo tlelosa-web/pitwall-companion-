@@ -7,6 +7,8 @@ living tracker you can update on the go.
 
 - 📴 **Works fully offline** after the first load (service worker precache).
 - 📱 **Installable** to your home screen on Android and iOS; runs standalone.
+- 📲 **Get the app on another device in one scan** — the Season tab has a
+  built-in QR code and copy-link button for the live URL.
 - 🔒 **All data stays on your device** — nothing is sent anywhere, no accounts,
   no analytics, no network calls at runtime.
 - ⚙️ **No build step, no framework, no server** — just static files.
